@@ -1,0 +1,44 @@
+# ==========================================
+# 1. Logs de errores (Servidor / PHP)
+# ==========================================
+error_log
+*.log
+
+# ==========================================
+# 2. Archivos subidos e importaciones (Uploads)
+# ==========================================
+# Ignora todos los CSV y Excel de la carpeta de marcaciones
+/admin/uploads/marcaciones/*.csv
+/admin/uploads/marcaciones/*.xlsx
+
+# (Opcional) Si quieres ignorar TODO dentro de uploads pero mantener la estructura de la carpeta:
+# /admin/uploads/*
+# !/admin/uploads/.gitkeep
+# !/admin/uploads/marcaciones/
+# /admin/uploads/marcaciones/*
+# !/admin/uploads/marcaciones/.gitkeep
+
+# ==========================================
+# 3. Archivos de Configuración y Credenciales
+# ==========================================
+# MUY RECOMENDADO: Descomenta la siguiente línea para evitar subir tus contraseñas de BD a GitHub.
+# /inc/db.php
+# Nota: Si lo haces, crea un archivo "db.example.php" con datos falsos y súbelo para que otros sepan la estructura.
+
+# ==========================================
+# 4. Archivos del Sistema Operativo
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==========================================
+# 5. Entornos de Desarrollo / IDEs (Local)
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
