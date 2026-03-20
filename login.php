@@ -31,6 +31,7 @@ $year = date('Y');
     <title>Intranet Municipal · Iniciar sesión</title>
     <link rel="stylesheet" href="static/css/theme.css">
     <link rel="stylesheet" href="static/css/login.css">
+    <link rel="icon" type="image/x-icon" href="static/img/logo.png">
 </head>
 <body>
 

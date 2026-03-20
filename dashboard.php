@@ -140,6 +140,7 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="static/css/theme.css">
   <link rel="stylesheet" href="static/css/dashboard.css">
+  <link rel="icon" type="image/x-icon" href="static/img/logo.png">
 </head>
 <body>
 
