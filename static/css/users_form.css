@@ -1,0 +1,592 @@
+/* ════════════════════════════════════════════════════════════
+   users_form.css — Admin · Crear / Editar Funcionario
+   Extiende theme.css. No redefinir variables base.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Page shell ─────────────────────────────────────────────── */
+.uf-page {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: var(--font-sans);
+  padding: 0 0 60px;
+}
+
+/* ── Topbar breadcrumb ──────────────────────────────────────── */
+.uf-topbar {
+  height: 52px;
+  background: var(--topbar-bg);
+  border-bottom: 1px solid var(--topbar-border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+}
+
+.uf-topbar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  transition: all var(--t-fast);
+}
+.uf-topbar-back:hover {
+  background: var(--surface-2);
+  border-color: var(--border-1);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.uf-topbar-back svg { flex-shrink: 0; }
+
+.uf-topbar-sep {
+  font-size: 13px;
+  color: var(--border-3);
+}
+
+.uf-topbar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.uf-topbar-spacer { flex: 1; }
+
+.uf-topbar-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-subtle);
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+/* ── Wrapper ────────────────────────────────────────────────── */
+.uf-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 28px 0;
+}
+
+/* ── Page heading ───────────────────────────────────────────── */
+.uf-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.uf-heading-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.uf-heading-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: var(--green-subtle);
+  border: 1px solid var(--green-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--green);
+}
+
+.uf-heading-text h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -.3px;
+  line-height: 1.2;
+  margin: 0 0 3px;
+}
+
+.uf-heading-text p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Alerts ─────────────────────────────────────────────────── */
+.uf-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid;
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.uf-alert svg { flex-shrink: 0; margin-top: 1px; }
+.uf-alert-error   { background: var(--red-subtle);   border-color: var(--red-border);   color: var(--red); }
+.uf-alert-success { background: var(--green-subtle);  border-color: var(--green-border); color: var(--green); }
+
+/* ── Form layout ────────────────────────────────────────────── */
+.uf-form { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Section card ───────────────────────────────────────────── */
+.uf-section {
+  background: var(--surface-1);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition: border-color var(--t-fast);
+}
+
+.uf-section:focus-within {
+  border-color: var(--border-3);
+}
+
+/* ── Section header ─────────────────────────────────────────── */
+.uf-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--border-1);
+  background: var(--surface-2);
+}
+
+.uf-section-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Color por sección */
+.uf-section-icon.blue   { background: var(--blue-subtle);   color: var(--blue);   border: 1px solid var(--blue-border); }
+.uf-section-icon.green  { background: var(--green-subtle);  color: var(--green);  border: 1px solid var(--green-border); }
+.uf-section-icon.amber  { background: var(--amber-subtle);  color: var(--amber);  border: 1px solid var(--amber-border); }
+.uf-section-icon.purple { background: var(--purple-subtle); color: var(--purple); border: 1px solid var(--purple-border); }
+
+.uf-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.uf-section-subtitle {
+  font-size: 11px;
+  color: var(--text-subtle);
+}
+
+/* ── Section body ───────────────────────────────────────────── */
+.uf-section-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Grid dentro de sección ─────────────────────────────────── */
+.uf-grid {
+  display: grid;
+  gap: 16px;
+}
+.uf-grid-2 { grid-template-columns: 1fr 1fr; }
+.uf-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.uf-col-full { grid-column: 1 / -1; }
+
+/* ── Field ──────────────────────────────────────────────────── */
+.uf-field { display: flex; flex-direction: column; gap: 5px; }
+
+.uf-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.uf-required {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.uf-hint {
+  font-size: 11px;
+  color: var(--text-subtle);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* ── Inputs & Selects ───────────────────────────────────────── */
+.uf-input,
+.uf-select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border-3);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  -webkit-appearance: none;
+          appearance: none;
+}
+
+.uf-input:focus,
+.uf-select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-subtle);
+}
+
+.uf-input::placeholder { color: var(--text-subtle); }
+
+/* Select: custom arrow */
+.uf-select-wrap { position: relative; }
+.uf-select-wrap .uf-select { padding-right: 32px; cursor: pointer; }
+.uf-select-wrap::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--text-subtle);
+}
+
+/* Variante: password */
+.uf-input-pw-wrap { position: relative; }
+.uf-input-pw-wrap .uf-input { padding-right: 40px; }
+.uf-input-pw-toggle {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 38px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  transition: color var(--t-fast);
+}
+.uf-input-pw-toggle:hover { color: var(--blue); }
+
+/* ── Toggle switch (activo / superadmin) ────────────────────── */
+.uf-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border-2);
+}
+.uf-toggle-row:first-child { border-top: none; }
+
+.uf-toggle-info { display: flex; flex-direction: column; gap: 2px; }
+.uf-toggle-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.uf-toggle-desc {
+  font-size: 11px;
+  color: var(--text-subtle);
+}
+
+.uf-toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.uf-toggle input { opacity: 0; width: 0; height: 0; }
+
+.uf-toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--surface-4);
+  border-radius: 999px;
+  border: 1px solid var(--border-3);
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+.uf-toggle-track::before {
+  content: '';
+  position: absolute;
+  left: 2px; top: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--text-subtle);
+  transition: transform var(--t-fast), background var(--t-fast);
+}
+
+.uf-toggle input:checked + .uf-toggle-track {
+  background: var(--green-subtle);
+  border-color: var(--green-border);
+}
+.uf-toggle input:checked + .uf-toggle-track::before {
+  transform: translateX(18px);
+  background: var(--green);
+}
+
+/* toggle ámbar para superadmin */
+.uf-toggle.is-amber input:checked + .uf-toggle-track {
+  background: var(--amber-subtle);
+  border-color: var(--amber-border);
+}
+.uf-toggle.is-amber input:checked + .uf-toggle-track::before {
+  background: var(--amber);
+}
+
+/* ── Roles checkboxes ───────────────────────────────────────── */
+.uf-roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.uf-role-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.uf-role-item:hover {
+  background: var(--surface-3);
+  border-color: var(--border-3);
+}
+.uf-role-item input[type="checkbox"] { display: none; }
+
+.uf-role-check {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border-3);
+  background: var(--bg);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+.uf-role-item input:checked ~ .uf-role-check-wrap .uf-role-check {
+  background: var(--purple-subtle);
+  border-color: var(--purple);
+}
+.uf-role-check svg { display: none; color: var(--purple); }
+.uf-role-item input:checked ~ .uf-role-check-wrap .uf-role-check svg { display: block; }
+
+.uf-role-check-wrap { display: flex; align-items: center; gap: 10px; flex: 1; }
+.uf-role-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.uf-role-code {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-subtle);
+  background: var(--surface-3);
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border-1);
+}
+
+/* ── Cargo picker ───────────────────────────────────────────── */
+.uf-cargo-select-wrap .uf-select {
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* Tipo-de-cargo badges row */
+.uf-tipo-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.uf-tipo-opt { position: relative; }
+.uf-tipo-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+.uf-tipo-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-1);
+  background: var(--surface-2);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--t-fast);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.uf-tipo-label:hover { border-color: var(--border-3); color: var(--text-primary); }
+.uf-tipo-opt input:checked + .uf-tipo-label {
+  background: var(--blue-subtle);
+  border-color: var(--blue-border);
+  color: var(--blue);
+}
+
+/* ── Divider con texto ──────────────────────────────────────── */
+.uf-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 12px;
+  color: var(--text-subtle);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+}
+.uf-divider::before,
+.uf-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-1);
+}
+
+/* ── Footer actions ─────────────────────────────────────────── */
+.uf-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 18px 18px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-lg);
+}
+
+.uf-footer-info {
+  font-size: 12px;
+  color: var(--text-subtle);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.uf-footer-actions { display: flex; gap: 10px; align-items: center; }
+
+/* Submit btn */
+.uf-btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 22px;
+  background: var(--green-dim);
+  border: 1px solid rgba(240,246,252,.12);
+  border-radius: var(--r-md);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast);
+  text-shadow: 0 1px 0 rgba(0,0,0,.15);
+  box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 2px 4px rgba(0,0,0,.4);
+}
+.uf-btn-submit:hover {
+  background: var(--green);
+  box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 3px 8px rgba(0,0,0,.4);
+  transform: translateY(-1px);
+}
+.uf-btn-submit:active { transform: translateY(0); background: #238636; box-shadow: none; }
+
+.uf-btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--t-fast);
+}
+.uf-btn-cancel:hover {
+  background: var(--surface-3);
+  border-color: var(--border-3);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+/* ── Empty state (sin roles / sin cargos) ───────────────────── */
+.uf-empty-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-subtle);
+  background: var(--surface-2);
+  border: 1px dashed var(--border-2);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+}
+.uf-empty-note svg { flex-shrink: 0; }
+
+/* SQL error debug box */
+.uf-debug {
+  background: var(--amber-subtle);
+  border: 1px solid var(--amber-border);
+  border-radius: var(--r);
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  margin-top: 6px;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .uf-wrap { padding: 20px 16px 0; }
+  .uf-grid-2,
+  .uf-grid-3 { grid-template-columns: 1fr; }
+  .uf-col-full { grid-column: auto; }
+  .uf-heading-text h1 { font-size: 18px; }
+  .uf-topbar { padding: 0 16px; }
+  .uf-footer { flex-direction: column; align-items: stretch; }
+  .uf-footer-actions { flex-direction: column; }
+  .uf-btn-submit,
+  .uf-btn-cancel { justify-content: center; }
+}
