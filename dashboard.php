@@ -86,6 +86,15 @@ try {
 /* ── Helpers ──────────────────────────────────────────────── */
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
+/** Fecha larga en español: "viernes, 20 de marzo de 2025" */
+function fechaLarga($fecha) {
+  $dias   = array('domingo','lunes','martes','miércoles','jueves','viernes','sábado');
+  $meses  = array(1=>'enero','febrero','marzo','abril','mayo','junio',
+                  'julio','agosto','septiembre','octubre','noviembre','diciembre');
+  $ts  = strtotime($fecha);
+  return $dias[date('w',$ts)] . ', ' . date('j',$ts) . ' de ' . $meses[(int)date('n',$ts)] . ' de ' . date('Y',$ts);
+}
+
 /** Genera iniciales del nombre (máx. 2 caracteres) */
 function initials($nombre) {
   $words = array_filter(explode(' ', strtoupper(trim($nombre))));
@@ -167,7 +176,6 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
 
     <div class="topbar-sep"></div>
     <span class="topbar-org">Sistema de Gestión Interna</span>
-    <span class="topbar-date"><?php echo h(date('Y-m-d')); ?></span>
   </header>
 
   <div class="body-layout">
@@ -373,24 +381,16 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
               <span class="greeting-name"><?php echo h($nombre); ?></span>
             </h1>
             <div class="page-subtitle">
-              <span class="date-highlight"><?php echo h($hoy); ?></span>
+              <span class="date-highlight"><?php echo h(fechaLarga($hoy)); ?></span>
               &nbsp;·&nbsp; Dashboard de actividades
             </div>
           </div>
           <div class="page-actions">
-            <a class="btn btn-secondary btn-sm" href="actividades_list.php?fecha=<?php echo h($hoy); ?>">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <rect x="3" y="4" width="18" height="18" rx="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-              </svg>
-              <span>Ver todas</span>
-            </a>
             <a class="btn btn-primary btn-sm" href="actividades_form.php">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
-              <span>Registrar</span>
+              <span>Registrar Actividad</span>
             </a>
           </div>
         </div>
