@@ -1,10 +1,8 @@
 /* ════════════════════════════════════════════════════════════
    dashboard.css — Intranet Municipal
-   Layout y componentes específicos del dashboard.
-   Requiere theme.css cargado antes.
+   Layout limpio de ancho completo.
    ════════════════════════════════════════════════════════════ */
 
-/* ── App Shell ────────────────────────────────────────────── */
 html, body { height: 100%; overflow: hidden; }
 
 .app-shell {
@@ -14,296 +12,13 @@ html, body { height: 100%; overflow: hidden; }
   overflow: hidden;
 }
 
-/* ── Topbar ───────────────────────────────────────────────── */
-.topbar {
-  height: 52px;
-  background: var(--topbar-bg);
-  border-bottom: 1px solid var(--topbar-border);
+.body-layout {
   display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 14px;
-  flex-shrink: 0;
-  z-index: 200;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-}
-
-.topbar-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--text-primary);
-  flex-shrink: 0;
-  text-decoration: none;
-  letter-spacing: -.2px;
-}
-.topbar-logo:hover { text-decoration: none; color: var(--text-primary); }
-
-.topbar-sep { width: 1px; height: 20px; background: var(--border-1); flex-shrink: 0; }
-
-.topbar-org { font-size: 13px; color: var(--text-subtle); flex: 1; }
-
-.topbar-date {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--blue);             /* ← fecha en azul para que destaque */
-  opacity: .8;
-  flex-shrink: 0;
-}
-
-/* Hamburger */
-.topbar-hamburger {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  color: var(--text-muted);
-  border-radius: var(--r);
-  transition: background var(--t-fast);
-  flex-shrink: 0;
-}
-.topbar-hamburger:hover { background: var(--surface-2); color: var(--text-primary); }
-
-/* ── Body Layout ──────────────────────────────────────────── */
-.body-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
-
-/* ══════════════════════════════════════════════════════════
-   SIDEBAR — jerarquía de color mejorada
-   ══════════════════════════════════════════════════════════ */
-.sidebar {
-  width: 260px;
-  flex-shrink: 0;
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--sidebar-border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 100;
-  transition: transform var(--t-normal);
-}
-
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.65);
-  z-index: 99;
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
-}
-
-.sidebar-scroll {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-bottom: 4px;
-}
-
-/* Footer de sidebar — logout siempre visible */
-.sidebar-footer {
-  flex-shrink: 0;
-  border-top: 1px solid var(--border-1);
-  padding: 6px 0;
-  background: var(--sidebar-bg);
-}
-
-/* ── Profile Block ──────────────────────────────────────── */
-.profile-block {
-  padding: 16px 14px 12px;
-  background: linear-gradient(180deg, #12181f 0%, var(--sidebar-bg) 100%);
-  border-bottom: 1px solid var(--border-1);
-}
-
-.profile-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, #1c3d6e 0%, #0f2448 100%);
-  border: 2px solid rgba(88,166,255,.3);
-  box-shadow: 0 0 0 1px rgba(88,166,255,.12), 0 2px 8px rgba(0,0,0,.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 700;
-  color: #79c0ff;           /* ← iniciales en azul claro vibrante */
-  letter-spacing: .5px;
-}
-
-.profile-info { min-width: 0; flex: 1; }
-
-.profile-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);  /* nombre blanco brillante */
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  position: relative;
+  min-height: 0; 
 }
-
-.profile-rut {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--amber);         /* ← RUT en ámbar para distinguirlo */
-  opacity: .75;
-  margin-top: 1px;
-}
-
-.profile-badges { display: flex; gap: 5px; flex-wrap: wrap; }
-
-/* ── Cargo Block ────────────────────────────────────────── */
-.cargo-block {
-  padding: 10px 14px 11px;
-  border-bottom: 1px solid var(--border-2);
-  background: rgba(255,255,255,.015);
-}
-
-.cargo-label {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .9px;
-  color: var(--green);          /* ← etiqueta "CARGO VIGENTE" en verde */
-  opacity: .8;
-  margin-bottom: 4px;
-}
-
-.cargo-role {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);   /* nombre del cargo blanco */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 2px;
-}
-
-.cargo-dir {
-  font-size: 12px;
-  color: var(--blue);           /* ← dirección en azul */
-  opacity: .85;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cargo-unit {
-  font-size: 11px;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cargo-dates {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--text-subtle);
-  margin-top: 4px;
-}
-
-/* ── Nav sections ───────────────────────────────────────── */
-.nav-section { padding: 10px 0 2px; }
-
-/* Cada sección tiene su propio color de etiqueta */
-.nav-section-label {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 0 14px 4px;
-  /* color sobreescrito por modificadores abajo */
-  color: var(--text-subtle);
-}
-
-/* Etiqueta ADMINISTRACIÓN — ámbar */
-.nav-section.section-admin > .nav-section-label {
-  color: var(--amber);
-  opacity: .9;
-}
-
-/* Etiqueta GESTIÓN — celeste/azul */
-.nav-section.section-gestion > .nav-section-label {
-  color: var(--blue);
-  opacity: .85;
-}
-
-/* Etiqueta MI ESPACIO — verde */
-.nav-section.section-personal > .nav-section-label {
-  color: var(--green);
-  opacity: .85;
-}
-
-/* ── Nav items ──────────────────────────────────────────── */
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 7px 14px;
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--text-muted);
-  border-left: 2px solid transparent;
-  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.nav-item:hover {
-  background: var(--sidebar-item-hover);
-  color: var(--text-primary);
-  border-left-color: var(--border-3);
-  text-decoration: none;
-}
-
-.nav-item.is-active {
-  background: var(--sidebar-item-active);
-  color: var(--blue);
-  border-left-color: var(--blue);
-  font-weight: 600;
-}
-
-.nav-item.is-danger { color: var(--red); opacity: .9; }
-.nav-item.is-danger:hover {
-  background: var(--red-subtle);
-  border-left-color: var(--red);
-  color: var(--red);
-  opacity: 1;
-}
-
-/* Iconos: coloreados por sección */
-.nav-item-icon {
-  flex-shrink: 0;
-  transition: opacity var(--t-fast), color var(--t-fast);
-}
-
-/* Admin section icons → ámbar */
-.section-admin .nav-item .nav-item-icon { color: var(--amber); opacity: .7; }
-.section-admin .nav-item:hover .nav-item-icon { opacity: 1; }
-
-/* Gestión section icons → azul */
-.section-gestion .nav-item .nav-item-icon { color: var(--blue); opacity: .7; }
-.section-gestion .nav-item:hover .nav-item-icon { opacity: 1; }
-
-/* Personal section icons → verde */
-.section-personal .nav-item .nav-item-icon { color: var(--green); opacity: .7; }
-.section-personal .nav-item:hover .nav-item-icon { opacity: 1; }
-.section-personal .nav-item.is-active .nav-item-icon { color: var(--blue); opacity: 1; }
-
-/* logout icon */
-.sidebar-footer .nav-item-icon { color: var(--red); opacity: .8; }
-.sidebar-footer .nav-item:hover .nav-item-icon { opacity: 1; }
-
-.nav-sep { height: 1px; background: var(--border-2); margin: 4px 14px; }
 
 /* ══════════════════════════════════════════════════════════
    MAIN CONTENT
@@ -315,6 +30,7 @@ html, body { height: 100%; overflow: hidden; }
   display: flex;
   flex-direction: column;
   background: var(--bg);
+  min-width: 0;
 }
 
 .page-wrapper {
@@ -322,18 +38,25 @@ html, body { height: 100%; overflow: hidden; }
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 1100px;
+  max-width: 1200px; /* Un poco más amplio ahora que no hay sidebar */
   width: 100%;
+  margin: 0 auto; /* Centra el contenido si la pantalla es muy grande */
 }
 
-/* ── Page Header ────────────────────────────────────────── */
-.page-header {
+/* ── Banner de Bienvenida y Cargo ──────────────────────────── */
+.welcome-banner {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  padding: 20px 24px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-lg);
+  gap: 20px;
   flex-wrap: wrap;
 }
+
+.wb-user { flex: 1; min-width: 200px; }
 
 .page-title {
   font-size: 24px;
@@ -341,19 +64,16 @@ html, body { height: 100%; overflow: hidden; }
   color: var(--text-primary);
   line-height: 1.2;
   letter-spacing: -.3px;
+  margin-bottom: 4px;
 }
 
-/* "Hola," en muted, nombre del usuario en blanco brillante */
 .page-title .greeting-word { color: var(--text-muted); font-weight: 400; }
 .page-title .greeting-name { color: var(--text-primary); }
 
 .page-subtitle {
   font-size: 13px;
   color: var(--text-muted);
-  margin-top: 3px;
 }
-
-/* Fecha del subtítulo resaltada en ámbar */
 .page-subtitle .date-highlight {
   color: var(--amber);
   font-family: var(--font-mono);
@@ -361,10 +81,32 @@ html, body { height: 100%; overflow: hidden; }
   opacity: .9;
 }
 
-.page-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+.wb-cargo {
+  flex: 1;
+  min-width: 250px;
+  padding: 0 20px;
+  border-left: 1px solid var(--border-2);
+  border-right: 1px solid var(--border-2);
+}
+
+.wb-cargo .cargo-role {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wb-cargo .cargo-unit {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.wb-actions { flex-shrink: 0; }
 
 /* ══════════════════════════════════════════════════════════
-   STAT CARDS — borde izquierdo de color por tipo
+   STAT CARDS
    ══════════════════════════════════════════════════════════ */
 .stats-grid {
   display: grid;
@@ -377,16 +119,14 @@ html, body { height: 100%; overflow: hidden; }
   border: 1px solid var(--border-1);
   border-radius: var(--r-lg);
   padding: 16px 18px;
-  border-left: 3px solid var(--border-1); /* sobreescrito por variante */
+  border-left: 3px solid var(--border-1);
   transition: border-color var(--t-fast), transform var(--t-fast);
-  position: relative;
 }
 .stat-card:hover {
   border-color: var(--border-3);
   transform: translateY(-1px);
 }
 
-/* Variantes de borde izquierdo */
 .stat-card.accent-default { border-left-color: var(--border-3); }
 .stat-card.accent-green   { border-left-color: var(--green); }
 .stat-card.accent-amber   { border-left-color: var(--amber); }
@@ -400,8 +140,6 @@ html, body { height: 100%; overflow: hidden; }
   color: var(--text-subtle);
   margin-bottom: 8px;
 }
-
-/* Etiquetas coloreadas por variante */
 .stat-card.accent-green .stat-label { color: var(--green); opacity: .8; }
 .stat-card.accent-amber .stat-label { color: var(--amber); opacity: .8; }
 .stat-card.accent-blue  .stat-label { color: var(--blue);  opacity: .8; }
@@ -413,86 +151,12 @@ html, body { height: 100%; overflow: hidden; }
   line-height: 1;
   margin-bottom: 5px;
 }
-
 .stat-card.accent-default .stat-value { color: var(--text-primary); }
 .stat-card.accent-green   .stat-value { color: var(--green); }
 .stat-card.accent-amber   .stat-value { color: var(--amber); }
 .stat-card.accent-blue    .stat-value { color: var(--blue); }
 
 .stat-sub { font-size: 12px; color: var(--text-muted); }
-
-/* ══════════════════════════════════════════════════════════
-   ADMIN FAST-ACCESS
-   ══════════════════════════════════════════════════════════ */
-.admin-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border-1);
-  gap: 12px;
-}
-
-.admin-panel-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--amber);          /* ← título del panel admin en ámbar */
-}
-
-.admin-panel-title svg { color: var(--amber); }
-
-.admin-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 16px;
-}
-
-.admin-tile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-1);
-  border-radius: var(--r-md);
-  padding: 13px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.admin-tile svg { flex-shrink: 0; color: var(--text-subtle); transition: color var(--t-fast); }
-
-.admin-tile:hover {
-  background: var(--surface-3);
-  color: var(--text-primary);
-  border-color: var(--border-3);
-  text-decoration: none;
-  transform: translateY(-1px);
-}
-.admin-tile:hover svg { color: var(--amber); }
-
-/* Tile destacado (Panel Admin) */
-.admin-tile.is-primary {
-  background: rgba(187,128,9,.12);
-  border-color: var(--amber-border);
-  color: var(--amber);
-}
-.admin-tile.is-primary svg { color: var(--amber); }
-.admin-tile.is-primary:hover { background: rgba(187,128,9,.2); color: var(--amber); }
-
-.admin-tile-label {
-  font-size: 12.5px;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 /* ══════════════════════════════════════════════════════════
    ACTIVITIES PANEL
@@ -521,7 +185,6 @@ html, body { height: 100%; overflow: hidden; }
   font-weight: 600;
   color: var(--text-primary);
 }
-
 .panel-title svg { color: var(--blue); }
 
 /* Prioridad */
@@ -530,39 +193,21 @@ html, body { height: 100%; overflow: hidden; }
 .prio-low    { color: var(--green); font-weight: 500; }
 .prio-other  { color: var(--text-subtle); }
 
-/* ── Mobile ─────────────────────────────────────────────── */
+/* ══ Responsive ═══════════════════════════════════════════ */
 @media (max-width: 800px) {
   html, body { overflow: auto; }
   .app-shell { height: 100dvh; }
-  .topbar-hamburger { display: flex; }
-
-  .sidebar {
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    height: 100%;
-    z-index: 300;
-    transform: translateX(-100%);
-    box-shadow: var(--shadow-lg);
-    width: 280px;
-  }
-  .sidebar.is-open { transform: translateX(0); }
-
-  .sidebar-overlay { display: block; }
-  .sidebar-overlay.is-hidden { display: none; }
-
   .body-layout { overflow: auto; }
   .main-content { overflow: visible; }
 
   .page-wrapper { padding: 16px; gap: 14px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .admin-grid { grid-template-columns: repeat(2, 1fr); padding: 12px; gap: 8px; }
-  .page-title { font-size: 20px; }
-  .page-actions .btn span { display: none; }
+  
+  .welcome-banner { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .wb-cargo { border-left: none; border-right: none; border-top: 1px solid var(--border-2); padding: 12px 0 0; width: 100%; }
 }
 
 @media (max-width: 480px) {
-  .stats-grid  { grid-template-columns: 1fr 1fr; }
-  .admin-grid  { grid-template-columns: 1fr 1fr; }
-  .topbar-org  { display: none; }
-  .topbar-date { display: none; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .wb-actions .btn span { display: none; } /* Oculta el texto del botón en móviles muy pequeños */
 }
