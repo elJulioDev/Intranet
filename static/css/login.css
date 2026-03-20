@@ -1,0 +1,253 @@
+/* ════════════════════════════════════════════════════════════
+   login.css — Intranet Municipal / Página de Ingreso
+   Requiere theme.css como base. Sin scroll en desktop.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Layout raíz: ocupa exactamente el viewport ──────────── */
+html, body {
+  height: 100%;
+  overflow: hidden; /* evita scroll en desktop */
+}
+
+@media (max-width: 480px) {
+  html, body { overflow: auto; } /* scroll permitido en móvil pequeño */
+}
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* logo+form al centro, footer abajo */
+  height: 100%;
+  min-height: 100vh;
+  padding: 28px 16px 0;
+  background: var(--bg);
+}
+
+/* ── Zona central (logo + form) ───────────────────────────── */
+.login-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  justify-content: center;
+  gap: 0;
+  padding-bottom: 12px;
+}
+
+/* ── Logo imagen ──────────────────────────────────────────── */
+.login-logo {
+  margin-bottom: 16px;
+}
+
+.login-logo img {
+  display: block;
+  width: auto;
+  height: 52px;          /* altura fija; ancho proporcional (1722:810 ≈ 2.12:1 → ~110px) */
+  object-fit: contain;
+  opacity: .92;
+  transition: opacity .15s ease;
+}
+
+.login-logo img:hover { opacity: 1; }
+
+/* ── Heading ──────────────────────────────────────────────── */
+.login-heading {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: -.2px;
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+/* ── Card formulario ──────────────────────────────────────── */
+.login-card {
+  width: 100%;
+  max-width: 340px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+  padding: 20px;
+}
+
+/* ── Fields ───────────────────────────────────────────────── */
+.login-field {
+  margin-bottom: 12px;
+}
+
+.login-field:last-of-type { margin-bottom: 0; }
+
+.login-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 7px 11px;
+  background: var(--bg);
+  border: 1px solid var(--border-3);
+  border-radius: var(--r);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color .12s ease, box-shadow .12s ease;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.login-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-subtle);
+}
+
+.login-input::placeholder { color: var(--text-subtle); }
+
+.login-input-hint {
+  font-size: 11px;
+  color: var(--text-subtle);
+  margin-top: 4px;
+}
+
+/* ── Error banner ─────────────────────────────────────────── */
+.login-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--red-subtle);
+  border: 1px solid var(--red-border);
+  border-radius: var(--r);
+  padding: 9px 11px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--red);
+  line-height: 1.4;
+}
+
+.login-error svg { flex-shrink: 0; margin-top: 1px; }
+
+/* ── Botón submit ─────────────────────────────────────────── */
+.login-submit {
+  width: 100%;
+  padding: 8px 16px;
+  background: var(--green-dim);
+  border: 1px solid rgba(240, 246, 252, .1);
+  border-radius: var(--r);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background .12s ease, box-shadow .12s ease;
+  text-shadow: 0 1px 0 rgba(0,0,0,.15);
+  box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 2px 4px rgba(0,0,0,.4);
+  margin-top: 14px;
+}
+
+.login-submit:hover {
+  background: var(--green);
+  box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 3px 6px rgba(0,0,0,.4);
+}
+
+.login-submit:active {
+  background: #238636;
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+/* ── Footer card "soporte" ────────────────────────────────── */
+.login-footer-card {
+  width: 100%;
+  max-width: 340px;
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+  padding: 11px 20px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 12px;
+}
+
+.login-footer-card a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.login-footer-card a:hover { text-decoration: underline; }
+
+/* ── Footer inferior ──────────────────────────────────────── */
+.login-bottom {
+  width: 100%;
+  border-top: 1px solid var(--border-2);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-subtle);
+}
+
+.login-bottom-left,
+.login-bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.login-bottom .sep { color: var(--border-3); }
+
+/* Botón toggle tema */
+.login-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-subtle);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-sans);
+  transition: color .12s ease;
+}
+
+.login-theme-btn:hover { color: var(--blue); }
+
+.login-theme-btn svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+/* ── Responsive móvil ─────────────────────────────────────── */
+@media (max-width: 480px) {
+  .login-page { padding-top: 24px; }
+
+  .login-logo img { height: 44px; }
+
+  .login-heading { font-size: 18px; margin-bottom: 14px; }
+
+  .login-card,
+  .login-footer-card { max-width: 100%; }
+
+  .login-bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    padding: 10px 12px;
+  }
+}
