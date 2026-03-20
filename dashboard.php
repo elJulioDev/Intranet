@@ -1,53 +1,37 @@
 <?php
-// intranet/dashboard.php (PHP 5.6)
+// intranet/dashboard.php (PHP 5.6) — con header global
 require __DIR__ . '/inc/db.php';
 require __DIR__ . '/inc/auth.php';
 require_login();
 
 $fid    = current_user_id();
 $nombre = !empty($_SESSION['nombre']) ? $_SESSION['nombre'] : 'Usuario';
-$rut    = !empty($_SESSION['rut']) ? $_SESSION['rut'] : '';
+$hoy    = date('Y-m-d');
 
 $esAdmin = function_exists('is_superadmin') && is_superadmin();
-$rolTxt  = $esAdmin ? 'ADMIN' : 'USUARIO';
 
-/**
- * Permiso módulo "Solicitud de Horas":
- * - Superadmin ve siempre
- * - O si está asignado en service_staff (can_config o can_manage)
- */
-$tienePermHoras = false;
+/* Actividades del día */
+$misActividades = array();
 try {
-  if ($esAdmin) {
-    $tienePermHoras = true;
-  } else {
-    $stmt = $pdo->prepare("
-      SELECT 1
-      FROM service_staff
-      WHERE funcionario_id = ?
-        AND (can_config=1 OR can_manage=1)
-      LIMIT 1
-    ");
-    $stmt->execute(array($fid));
-    $tienePermHoras = (bool)$stmt->fetchColumn();
-  }
-} catch (Exception $e) {
-  $tienePermHoras = false;
-}
+  $stmt = $pdo->prepare("
+    SELECT id, hora, titulo, estado, prioridad, referencia
+    FROM actividad_registro
+    WHERE funcionario_id = ? AND fecha = ?
+    ORDER BY hora ASC, id ASC
+    LIMIT 20
+  ");
+  $stmt->execute(array($fid, $hoy));
+  $misActividades = $stmt->fetchAll();
+} catch (Exception $e) { $misActividades = array(); }
 
-/**
- * Cargo vigente:
- * funcionario_cargos -> cargos -> unidades -> direcciones
- * Prioriza titular sobre subrogante, más reciente.
- */
+/* Cargo vigente */
 $cargoVigente = null;
 try {
   $stmt = $pdo->prepare("
-    SELECT
-      fc.tipo, fc.fecha_desde, fc.fecha_hasta,
-      c.nombre AS cargo_nombre,
-      u.nombre AS unidad_nombre,
-      d.nombre AS direccion_nombre
+    SELECT fc.tipo, fc.fecha_desde, fc.fecha_hasta,
+           c.nombre AS cargo_nombre,
+           u.nombre AS unidad_nombre,
+           d.nombre AS direccion_nombre
     FROM funcionario_cargos fc
     JOIN cargos c       ON c.id = fc.cargo_id
     JOIN unidades u     ON u.id = c.unidad_id
@@ -61,85 +45,45 @@ try {
   ");
   $stmt->execute(array($fid));
   $cargoVigente = $stmt->fetch();
-} catch (Exception $e) {
-  $cargoVigente = null;
-}
+} catch (Exception $e) { $cargoVigente = null; }
 
-/** Resumen actividades del día (del usuario) */
-$hoy = date('Y-m-d');
-$misActividades = array();
-try {
-  $stmt = $pdo->prepare("
-    SELECT id, hora, titulo, estado, prioridad, referencia
-    FROM actividad_registro
-    WHERE funcionario_id = ?
-      AND fecha = ?
-    ORDER BY hora ASC, id ASC
-    LIMIT 20
-  ");
-  $stmt->execute(array($fid, $hoy));
-  $misActividades = $stmt->fetchAll();
-} catch (Exception $e) {
-  $misActividades = array();
-}
-
-/* ── Helpers ──────────────────────────────────────────────── */
+/* ── Helpers ── */
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
-
-/** Fecha larga en español: "viernes, 20 de marzo de 2025" */
-function fechaLarga($fecha) {
-  $dias   = array('domingo','lunes','martes','miércoles','jueves','viernes','sábado');
-  $meses  = array(1=>'enero','febrero','marzo','abril','mayo','junio',
-                  'julio','agosto','septiembre','octubre','noviembre','diciembre');
-  $ts  = strtotime($fecha);
+function fechaLarga($f) {
+  $dias  = array('domingo','lunes','martes','miércoles','jueves','viernes','sábado');
+  $meses = array(1=>'enero','febrero','marzo','abril','mayo','junio',
+                 'julio','agosto','septiembre','octubre','noviembre','diciembre');
+  $ts = strtotime($f);
   return $dias[date('w',$ts)] . ', ' . date('j',$ts) . ' de ' . $meses[(int)date('n',$ts)] . ' de ' . date('Y',$ts);
 }
-
-/** Genera iniciales del nombre (máx. 2 caracteres) */
-function initials($nombre) {
-  $words = array_filter(explode(' ', strtoupper(trim($nombre))));
-  $out = '';
-  foreach ($words as $w) { $out .= $w[0]; if (strlen($out) === 2) break; }
-  return $out ?: '?';
+function initials($n) {
+  $w = array_filter(explode(' ', strtoupper(trim($n))));
+  $o = '';
+  foreach ($w as $x) { $o .= $x[0]; if (strlen($o) === 2) break; }
+  return $o ?: '?';
+}
+function estadoClass($e) {
+  $m = array('completada'=>'status-done','completado'=>'status-done','done'=>'status-done',
+             'pendiente'=>'status-pending','pending'=>'status-pending',
+             'en curso'=>'status-active','activo'=>'status-active','active'=>'status-active',
+             'cancelada'=>'status-cancel','cancelado'=>'status-cancel');
+  return isset($m[strtolower(trim($e))]) ? $m[strtolower(trim($e))] : 'status-none';
+}
+function prioClass($p) {
+  $m = array('alta'=>'prio-high','high'=>'prio-high','media'=>'prio-medium','medium'=>'prio-medium',
+             'baja'=>'prio-low','low'=>'prio-low');
+  return isset($m[strtolower(trim($p))]) ? $m[strtolower(trim($p))] : 'prio-other';
 }
 
-/** Clase CSS de estado para status-pill */
-function estadoClass($estado) {
-  $map = array(
-    'completada'  => 'status-done',
-    'completado'  => 'status-done',
-    'done'        => 'status-done',
-    'pendiente'   => 'status-pending',
-    'pending'     => 'status-pending',
-    'en curso'    => 'status-active',
-    'activo'      => 'status-active',
-    'active'      => 'status-active',
-    'cancelada'   => 'status-cancel',
-    'cancelado'   => 'status-cancel',
-  );
-  $key = strtolower(trim($estado));
-  return isset($map[$key]) ? $map[$key] : 'status-none';
-}
-
-/** Clase CSS de prioridad */
-function prioClass($prio) {
-  $map = array('alta' => 'prio-high', 'high' => 'prio-high',
-               'media' => 'prio-medium', 'medium' => 'prio-medium',
-               'baja' => 'prio-low', 'low' => 'prio-low');
-  $key = strtolower(trim($prio));
-  return isset($map[$key]) ? $map[$key] : 'prio-other';
-}
-
-/* ── Contadores rápidos desde $misActividades ─────────────── */
-$cntTotal       = count($misActividades);
-$cntCompletadas = 0;
-$cntPendientes  = 0;
+/* Contadores */
+$cntTotal = count($misActividades);
+$cntComp = 0; $cntPend = 0;
 foreach ($misActividades as $a) {
   $e = strtolower(trim($a['estado']));
-  if (in_array($e, array('completada','completado','done'))) $cntCompletadas++;
-  if (in_array($e, array('pendiente','pending')))            $cntPendientes++;
+  if (in_array($e, array('completada','completado','done'))) $cntComp++;
+  if (in_array($e, array('pendiente','pending')))            $cntPend++;
 }
-$cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
+$cntCurso = max(0, $cntTotal - $cntComp - $cntPend);
 ?>
 <!doctype html>
 <html lang="es">
@@ -155,33 +99,15 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
 
 <div class="app-shell">
 
-  <header class="topbar">
-    <button class="topbar-hamburger" id="hamburgerBtn" aria-label="Menú">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <line x1="3" y1="6"  x2="21" y2="6"/>
-        <line x1="3" y1="12" x2="21" y2="12"/>
-        <line x1="3" y1="18" x2="21" y2="18"/>
-      </svg>
-    </button>
-
-    <a href="dashboard.php" class="topbar-logo">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round">
-        <rect x="3" y="3" width="7" height="7" rx="1"/>
-        <rect x="14" y="3" width="7" height="7" rx="1"/>
-        <rect x="3" y="14" width="7" height="7" rx="1"/>
-        <rect x="14" y="14" width="7" height="7" rx="1"/>
-      </svg>
-      Intranet Municipal
-    </a>
-
-    <div class="topbar-sep"></div>
-    <span class="topbar-org">Sistema de Gestión Interna</span>
-  </header>
+  <!-- ══ HEADER GLOBAL (reemplaza la topbar manual) ══════════ -->
+  <?php require __DIR__ . '/inc/header.php'; ?>
+  <!-- ════════════════════════════════════════════════════════ -->
 
   <div class="body-layout">
 
     <div class="sidebar-overlay is-hidden" id="sidebarOverlay"></div>
 
+    <!-- Sidebar: solo en dashboard, complementa el header global -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-scroll">
 
@@ -190,7 +116,7 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
             <div class="avatar"><?php echo h(initials($nombre)); ?></div>
             <div class="profile-info">
               <div class="profile-name"><?php echo h($nombre); ?></div>
-              <div class="profile-rut"><?php echo h($rut); ?></div>
+              <div class="profile-rut"><?php echo h($_SESSION['rut'] ?? ''); ?></div>
             </div>
           </div>
           <div class="profile-badges">
@@ -200,7 +126,7 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
               <span class="badge badge-gray">SIN CARGO</span>
             <?php endif; ?>
             <span class="badge <?php echo $esAdmin ? 'badge-amber' : 'badge-gray'; ?>">
-              <?php echo h($rolTxt); ?>
+              <?php echo $esAdmin ? 'ADMIN' : 'USUARIO'; ?>
             </span>
           </div>
         </div>
@@ -213,138 +139,18 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
           <div class="cargo-unit"><?php echo h($cargoVigente['unidad_nombre']); ?></div>
           <div class="cargo-dates">
             <?php echo h($cargoVigente['fecha_desde']); ?>
-            <?php echo $cargoVigente['fecha_hasta'] ? ' → ' . h($cargoVigente['fecha_hasta']) : ' → vigente'; ?>
+            <?php echo $cargoVigente['fecha_hasta'] ? ' → '.h($cargoVigente['fecha_hasta']) : ' → vigente'; ?>
           </div>
         </div>
         <?php else: ?>
         <div class="cargo-block">
           <div class="cargo-label">Cargo vigente</div>
-          <div class="cargo-unit" style="color:var(--text-subtle);font-style:italic;font-size:12px;">
-            Sin cargo asignado para hoy.
-          </div>
+          <div class="cargo-unit" style="color:var(--text-subtle);font-style:italic;font-size:12px;">Sin cargo asignado.</div>
         </div>
-        <?php endif; ?>
-
-        <?php if ($esAdmin): ?>
-        <nav class="nav-section section-admin">
-          <div class="nav-section-label">Administración</div>
-
-          <a class="nav-item" href="admin/index.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
-            </svg>
-            Panel Admin
-          </a>
-
-          <div class="nav-sep"></div>
-
-          <a class="nav-item" href="admin/users_form.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-              <line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/>
-            </svg>
-            Crear usuario
-          </a>
-          <a class="nav-item" href="admin/direcciones_form.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
-            Nueva dirección
-          </a>
-          <a class="nav-item" href="admin/unidades_form.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <rect x="2" y="7" width="20" height="14" rx="2"/>
-              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-            </svg>
-            Nueva unidad
-          </a>
-          <a class="nav-item" href="admin/cargos_form.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
-            </svg>
-            Nuevo cargo
-          </a>
-
-          <div class="nav-sep"></div>
-
-          <a class="nav-item" href="admin/direcciones_list.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
-              <line x1="8" y1="18" x2="21" y2="18"/>
-              <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
-              <line x1="3" y1="18" x2="3.01" y2="18"/>
-            </svg>
-            Direcciones
-          </a>
-          <a class="nav-item" href="admin/unidades_list.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
-              <line x1="8" y1="18" x2="21" y2="18"/>
-              <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
-              <line x1="3" y1="18" x2="3.01" y2="18"/>
-            </svg>
-            Unidades
-          </a>
-          <a class="nav-item" href="admin/cargos_list.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
-              <line x1="8" y1="18" x2="21" y2="18"/>
-              <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/>
-              <line x1="3" y1="18" x2="3.01" y2="18"/>
-            </svg>
-            Cargos
-          </a>
-
-          <div class="nav-sep"></div>
-
-          <a class="nav-item" href="admin/marcaciones/importar.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
-              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
-            </svg>
-            Importar marcaciones
-          </a>
-          <a class="nav-item" href="admin/marcaciones/index.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <rect x="3" y="4" width="18" height="18" rx="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-            Control de marcaciones
-          </a>
-        </nav>
-        <?php endif; ?>
-
-        <?php if ($tienePermHoras): ?>
-        <nav class="nav-section section-gestion">
-          <div class="nav-section-label">Gestión</div>
-          <a class="nav-item" href="admin/horas_dashboard.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-            Solicitud de horas (Admin)
-          </a>
-        </nav>
         <?php endif; ?>
 
         <nav class="nav-section section-personal">
           <div class="nav-section-label">Mi espacio</div>
-          <a class="nav-item" href="solicitud_horas.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
-            </svg>
-            Solicitar hora
-          </a>
-          <a class="nav-item" href="marcaciones/mi.php">
-            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-            Mis marcaciones
-          </a>
           <a class="nav-item" href="actividades_form.php">
             <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -359,9 +165,81 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
             </svg>
             Actividades de hoy
           </a>
+          <a class="nav-item" href="marcaciones/mi.php">
+            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Mis marcaciones
+          </a>
+          <a class="nav-item" href="solicitud_horas.php">
+            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+            Solicitar hora
+          </a>
         </nav>
 
-      </div><div class="sidebar-footer">
+        <?php if ($esAdmin): ?>
+        <nav class="nav-section section-admin">
+          <div class="nav-section-label">Administración</div>
+          <a class="nav-item" href="admin/index.php">
+            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+            </svg>
+            Panel Admin
+          </a>
+          <div class="nav-sep"></div>
+          <a class="nav-item" href="admin/users_form.php">
+            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/>
+            </svg>
+            Crear usuario
+          </a>
+          <a class="nav-item" href="admin/direcciones_list.php">
+            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Direcciones
+          </a>
+          <a class="nav-item" href="admin/unidades_list.php">
+            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            </svg>
+            Unidades
+          </a>
+          <a class="nav-item" href="admin/cargos_list.php">
+            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
+            </svg>
+            Cargos
+          </a>
+          <div class="nav-sep"></div>
+          <a class="nav-item" href="admin/marcaciones/importar.php">
+            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+            Importar marcaciones
+          </a>
+          <a class="nav-item" href="admin/marcaciones/index.php">
+            <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Control marcaciones
+          </a>
+        </nav>
+        <?php endif; ?>
+
+      </div>
+
+      <div class="sidebar-footer">
         <a class="nav-item is-danger" href="logout.php">
           <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -371,6 +249,7 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
         </a>
       </div>
     </aside>
+
     <main class="main-content">
       <div class="page-wrapper">
 
@@ -403,86 +282,20 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
           </div>
           <div class="stat-card accent-green">
             <div class="stat-label">Completadas</div>
-            <div class="stat-value"><?php echo $cntCompletadas; ?></div>
+            <div class="stat-value"><?php echo $cntComp; ?></div>
             <div class="stat-sub">finalizadas</div>
           </div>
           <div class="stat-card accent-amber">
             <div class="stat-label">Pendientes</div>
-            <div class="stat-value"><?php echo $cntPendientes; ?></div>
+            <div class="stat-value"><?php echo $cntPend; ?></div>
             <div class="stat-sub">en espera</div>
           </div>
           <div class="stat-card accent-blue">
             <div class="stat-label">En curso</div>
-            <div class="stat-value"><?php echo $cntEnCurso; ?></div>
+            <div class="stat-value"><?php echo $cntCurso; ?></div>
             <div class="stat-sub">en progreso</div>
           </div>
         </div>
-
-        <!--- Acceso Rapido
-        <?php if ($esAdmin || $tienePermHoras): ?>
-        <div class="card">
-          <div class="admin-panel-header">
-            <div class="admin-panel-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
-              </svg>
-              Accesos Rápidos
-            </div>
-          </div>
-          <div class="admin-grid">
-            <?php if ($esAdmin): ?>
-              <a class="admin-tile is-primary" href="admin/index.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                <span class="admin-tile-label">Panel Admin</span>
-              </a>
-              <a class="admin-tile" href="admin/users_form.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
-                <span class="admin-tile-label">Crear usuario</span>
-              </a>
-              <a class="admin-tile" href="admin/direcciones_form.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                <span class="admin-tile-label">Nueva dirección</span>
-              </a>
-              <a class="admin-tile" href="admin/unidades_form.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-                <span class="admin-tile-label">Nueva unidad</span>
-              </a>
-              <a class="admin-tile" href="admin/cargos_form.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>
-                <span class="admin-tile-label">Nuevo cargo</span>
-              </a>
-              <a class="admin-tile" href="admin/direcciones_list.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                <span class="admin-tile-label">Ver Direcciones</span>
-              </a>
-              <a class="admin-tile" href="admin/unidades_list.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                <span class="admin-tile-label">Ver Unidades</span>
-              </a>
-              <a class="admin-tile" href="admin/cargos_list.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                <span class="admin-tile-label">Ver Cargos</span>
-              </a>
-              <a class="admin-tile" href="admin/marcaciones/importar.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-                <span class="admin-tile-label">Importar marc.</span>
-              </a>
-              <a class="admin-tile" href="admin/marcaciones/index.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                <span class="admin-tile-label">Control marc.</span>
-              </a>
-            <?php endif; ?>
-
-            <?php if ($tienePermHoras): ?>
-              <a class="admin-tile" href="admin/horas_dashboard.php">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                <span class="admin-tile-label">Solicitud de horas</span>
-              </a>
-            <?php endif; ?>
-          </div>
-        </div>
-        <?php endif; ?>
-        --->
 
         <div class="activities-panel card">
           <div class="panel-header card-header">
@@ -513,7 +326,7 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
               </a>
             </div>
           <?php else: ?>
-            <div class="table-responsive" style="overflow-x: auto;">
+            <div class="table-responsive" style="overflow-x:auto;">
               <table class="table">
                 <thead>
                   <tr>
@@ -529,16 +342,8 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
                     <tr>
                       <td class="td-mono"><?php echo h($a['hora']); ?></td>
                       <td><?php echo h($a['titulo']); ?></td>
-                      <td>
-                        <span class="status-pill <?php echo estadoClass($a['estado']); ?>">
-                          <?php echo h($a['estado']); ?>
-                        </span>
-                      </td>
-                      <td>
-                        <span class="<?php echo prioClass($a['prioridad']); ?>">
-                          <?php echo h($a['prioridad']); ?>
-                        </span>
-                      </td>
+                      <td><span class="status-pill <?php echo estadoClass($a['estado']); ?>"><?php echo h($a['estado']); ?></span></td>
+                      <td><span class="<?php echo prioClass($a['prioridad']); ?>"><?php echo h($a['prioridad']); ?></span></td>
                       <td class="td-mono"><?php echo h($a['referencia']); ?></td>
                     </tr>
                   <?php endforeach; ?>
@@ -548,19 +353,26 @@ $cntEnCurso = max(0, $cntTotal - $cntCompletadas - $cntPendientes);
           <?php endif; ?>
         </div>
 
-      </div></main>
+      </div>
+    </main>
 
-  </div></div><script>
+  </div>
+</div>
+
+<script>
+/* Sidebar toggle en móvil — accionado desde el header global */
 (function () {
-  var hamburger = document.getElementById('hamburgerBtn');
-  var sidebar   = document.getElementById('sidebar');
-  var overlay   = document.getElementById('sidebarOverlay');
+  /* En escritorio la sidebar es fija. En móvil se puede abrir
+     desde el sidebar-overlay (tap fuera = cerrar).            */
+  var overlay = document.getElementById('sidebarOverlay');
+  var sidebar = document.getElementById('sidebar');
 
-  function openSidebar()  { sidebar.classList.add('is-open');    overlay.classList.remove('is-hidden'); }
-  function closeSidebar() { sidebar.classList.remove('is-open'); overlay.classList.add('is-hidden'); }
-
-  if (hamburger) hamburger.addEventListener('click', openSidebar);
-  if (overlay)   overlay.addEventListener('click', closeSidebar);
+  if (overlay) {
+    overlay.addEventListener('click', function () {
+      if (sidebar) sidebar.classList.remove('is-open');
+      overlay.classList.add('is-hidden');
+    });
+  }
 })();
 </script>
 

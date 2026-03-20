@@ -1,0 +1,466 @@
+/* ════════════════════════════════════════════════════════════
+   header.css — Header Global · Intranet Municipal
+   Requiere theme.css cargado antes (variables CSS).
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Barra principal ──────────────────────────────────────── */
+.gh-bar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  height: 52px;
+  background: var(--topbar-bg, rgba(13,17,23,.97));
+  border-bottom: 1px solid var(--topbar-border, #21262d);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  flex-shrink: 0; /* dentro de flex-column (app-shell) */
+}
+
+/* Cuando el menú móvil está abierto, la barra se expande */
+.gh-bar.menu-open { /* no se usa; el menú cuelga abajo */ }
+
+/* ── Contenedor interno ───────────────────────────────────── */
+.gh-inner {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  padding: 0 18px;
+  gap: 4px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Marca ────────────────────────────────────────────────── */
+.gh-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-right: 8px;
+  padding: 5px 8px;
+  border-radius: var(--r-md, 8px);
+  transition: background var(--t-fast, .1s ease);
+}
+
+.gh-brand:hover {
+  background: var(--surface-2, #1c2128);
+  text-decoration: none;
+}
+
+.gh-logo {
+  width: auto;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
+.gh-brand-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary, #e6edf3);
+  letter-spacing: -.2px;
+  white-space: nowrap;
+}
+
+.gh-brand-sub {
+  font-weight: 400;
+  color: var(--text-muted, #c7c9cb);
+}
+
+/* ── Navegación escritorio ────────────────────────────────── */
+.gh-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+/* ── Grupo (item con dropdown) ────────────────────────────── */
+.gh-group {
+  position: relative;
+}
+
+.gh-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--r-md, 8px);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted, #c7c9cb);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--t-fast, .1s), color var(--t-fast, .1s), border-color var(--t-fast, .1s);
+  line-height: 1;
+  outline: none;
+}
+
+.gh-nav-btn svg:first-child { color: var(--text-subtle, #6e7681); flex-shrink: 0; }
+
+.gh-nav-btn:hover,
+.gh-group.is-active > .gh-nav-btn {
+  background: var(--surface-2, #1c2128);
+  border-color: var(--border-1, #30363d);
+  color: var(--text-primary, #e6edf3);
+}
+.gh-nav-btn:hover svg:first-child,
+.gh-group.is-active > .gh-nav-btn svg:first-child { color: var(--blue, #58a6ff); }
+
+/* Grupo admin → acento ámbar */
+.gh-group--admin > .gh-nav-btn:hover,
+.gh-group--admin.is-active > .gh-nav-btn { border-color: var(--amber-border, rgba(187,128,9,.3)); }
+.gh-group--admin > .gh-nav-btn:hover svg:first-child,
+.gh-group--admin.is-active > .gh-nav-btn svg:first-child { color: var(--amber, #d29922); }
+
+/* Dropdown abierto */
+.gh-group.is-open > .gh-nav-btn {
+  background: var(--surface-2, #1c2128);
+  border-color: var(--blue-border, rgba(56,139,253,.3));
+  color: var(--text-primary, #e6edf3);
+}
+.gh-group--admin.is-open > .gh-nav-btn { border-color: var(--amber-border, rgba(187,128,9,.3)); }
+
+/* Chevron animado */
+.gh-chev {
+  flex-shrink: 0;
+  color: var(--text-subtle, #6e7681);
+  transition: transform var(--t-fast, .1s ease), color var(--t-fast, .1s ease);
+}
+.gh-group.is-open > .gh-nav-btn .gh-chev { transform: rotate(180deg); color: var(--blue, #58a6ff); }
+.gh-group--admin.is-open > .gh-nav-btn .gh-chev { color: var(--amber, #d29922); }
+
+/* ── Dropdown panel ───────────────────────────────────────── */
+.gh-drop {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 220px;
+  background: var(--surface-1, #161b22);
+  border: 1px solid var(--border-1, #30363d);
+  border-radius: var(--r-lg, 12px);
+  box-shadow: var(--shadow-lg, 0 8px 24px rgba(0,0,0,.6));
+  padding: 6px;
+  z-index: 600;
+  animation: gh-drop-in .12s ease;
+}
+
+.gh-group.is-open > .gh-drop { display: block; }
+
+/* Variante ancha (Admin) */
+.gh-drop--wide {
+  min-width: 260px;
+}
+
+@keyframes gh-drop-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Item del dropdown ────────────────────────────────────── */
+.gh-drop-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: var(--r-md, 8px);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary, #b1bac4);
+  text-decoration: none;
+  transition: background var(--t-fast, .1s), color var(--t-fast, .1s);
+  white-space: nowrap;
+}
+
+.gh-drop-item svg { flex-shrink: 0; color: var(--text-subtle, #6e7681); transition: color var(--t-fast, .1s); }
+
+.gh-drop-item:hover {
+  background: var(--surface-3, #21262d);
+  color: var(--text-primary, #e6edf3);
+  text-decoration: none;
+}
+.gh-drop-item:hover svg { color: var(--blue, #58a6ff); }
+
+.gh-drop-item.is-active {
+  background: var(--sidebar-item-active, #1a3a5c);
+  color: var(--blue, #58a6ff);
+  font-weight: 500;
+}
+.gh-drop-item.is-active svg { color: var(--blue, #58a6ff); }
+
+/* ── Separador y etiqueta de sección ─────────────────────── */
+.gh-drop-sep {
+  height: 1px;
+  background: var(--border-1, #30363d);
+  margin: 5px 4px;
+}
+
+.gh-drop-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .9px;
+  color: var(--text-subtle, #6e7681);
+  padding: 6px 10px 3px;
+}
+
+/* ── Pill amber (SA / ADMIN) ──────────────────────────────── */
+.gh-pill-amber {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  color: var(--amber, #d29922);
+  background: var(--amber-subtle, rgba(187,128,9,.15));
+  border: 1px solid var(--amber-border, rgba(187,128,9,.3));
+  line-height: 1.4;
+}
+
+/* ── Derecha: perfil + logout ─────────────────────────────── */
+.gh-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Chip de perfil */
+.gh-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  border: 1px solid var(--border-1, #30363d);
+  background: var(--surface-2, #1c2128);
+  transition: border-color var(--t-fast, .1s), background var(--t-fast, .1s);
+  cursor: default;
+}
+.gh-chip:hover { border-color: var(--border-3, #3d444d); }
+
+.gh-chip-av {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1c3d6e 0%, #0f2448 100%);
+  border: 1.5px solid rgba(88,166,255,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  color: #79c0ff;
+  flex-shrink: 0;
+  letter-spacing: .3px;
+}
+
+.gh-chip-info {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  max-width: 160px;
+  overflow: hidden;
+}
+
+.gh-chip-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary, #e6edf3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+/* Botón logout */
+.gh-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: var(--r-md, 8px);
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-subtle, #6e7681);
+  text-decoration: none;
+  transition: all var(--t-fast, .1s ease);
+  white-space: nowrap;
+}
+
+.gh-logout:hover {
+  background: var(--red-subtle, rgba(218,54,51,.12));
+  border-color: var(--red-border, rgba(218,54,51,.3));
+  color: var(--red, #f85149);
+  text-decoration: none;
+}
+
+/* Login btn (cuando no está logueado) */
+.gh-login-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--r-md, 8px);
+  border: 1px solid var(--green-border, rgba(46,160,67,.3));
+  background: var(--green-subtle, rgba(46,160,67,.15));
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green, #3fb950);
+  text-decoration: none;
+  transition: all var(--t-fast, .1s ease);
+}
+.gh-login-btn:hover { background: rgba(46,160,67,.25); color: var(--green, #3fb950); text-decoration: none; }
+
+/* ── Hamburger (móvil) ────────────────────────────────────── */
+.gh-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--r-md, 8px);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background var(--t-fast, .1s), border-color var(--t-fast, .1s);
+}
+
+.gh-hamburger:hover {
+  background: var(--surface-2, #1c2128);
+  border-color: var(--border-1, #30363d);
+}
+
+.gh-hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--text-muted, #c7c9cb);
+  border-radius: 2px;
+  transition: transform .2s ease, opacity .2s ease, width .2s ease;
+  transform-origin: center;
+}
+
+/* X cuando está abierto */
+.gh-hamburger.is-open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.gh-hamburger.is-open span:nth-child(2) { opacity: 0; width: 0; }
+.gh-hamburger.is-open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* ── Menú móvil ───────────────────────────────────────────── */
+.gh-mob-menu {
+  display: none;
+  position: absolute;
+  top: 52px;
+  left: 0;
+  right: 0;
+  background: var(--surface-1, #161b22);
+  border-bottom: 1px solid var(--border-1, #30363d);
+  box-shadow: var(--shadow-lg, 0 8px 24px rgba(0,0,0,.6));
+  z-index: 490;
+  max-height: calc(100vh - 52px);
+  overflow-y: auto;
+  animation: gh-mob-in .15s ease;
+}
+
+@keyframes gh-mob-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.gh-mob-menu.is-open { display: block; }
+
+.gh-mob-sect {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-2, #21262d);
+}
+.gh-mob-sect:last-child { border-bottom: none; }
+
+.gh-mob-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .9px;
+  color: var(--text-subtle, #6e7681);
+  padding: 6px 18px 3px;
+}
+
+.gh-mob-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary, #b1bac4);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: background var(--t-fast, .1s), color var(--t-fast, .1s), border-color var(--t-fast, .1s);
+}
+
+.gh-mob-item:hover {
+  background: var(--surface-2, #1c2128);
+  color: var(--text-primary, #e6edf3);
+  border-left-color: var(--border-3, #3d444d);
+  text-decoration: none;
+}
+
+.gh-mob-item.is-active {
+  color: var(--blue, #58a6ff);
+  background: var(--sidebar-item-active, #1a3a5c);
+  border-left-color: var(--blue, #58a6ff);
+  font-weight: 500;
+}
+
+.gh-mob-item.is-danger { color: var(--red, #f85149); }
+.gh-mob-item.is-danger:hover {
+  background: var(--red-subtle, rgba(218,54,51,.12));
+  border-left-color: var(--red, #f85149);
+  color: var(--red, #f85149);
+}
+
+/* ── Páginas con header suelto (no dashboard) ─────────────── */
+/* Aplica padding-top al body para que el contenido no quede
+   bajo el sticky header. El dashboard ya lo maneja con su
+   flex layout, así que se neutraliza allí. */
+body.has-gh-header {
+  padding-top: 0; /* el header es sticky; el layout normal fluye bien */
+}
+
+/* ══ Responsive ════════════════════════════════════════════ */
+@media (max-width: 860px) {
+  .gh-nav       { display: none; }
+  .gh-hamburger { display: flex; }
+  .gh-chip-info { display: none; }
+  .gh-chip {
+    padding: 0;
+    background: none;
+    border-color: transparent;
+  }
+  .gh-chip-av { width: 32px; height: 32px; font-size: 12px; }
+  .gh-logout-txt { display: none; }
+  .gh-logout { padding: 6px 8px; }
+  .gh-brand-name { display: none; }
+  .gh-brand { gap: 0; padding: 5px 4px; }
+  .gh-logo  { height: 30px; }
+}
+
+@media (max-width: 480px) {
+  .gh-inner { padding: 0 12px; gap: 4px; }
+  .gh-chip  { display: none; }
+}
