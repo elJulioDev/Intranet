@@ -1,24 +1,8 @@
 /* ════════════════════════════════════════════════════════════
    dashboard.css — Intranet Municipal
-   Layout limpio de ancho completo.
+   Estilos del contenido principal del dashboard.
+   El layout base (app-shell, topbar, sidebar) está en sidebar.css.
    ════════════════════════════════════════════════════════════ */
-
-html, body { height: 100%; overflow: hidden; }
-
-.app-shell {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.body-layout {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-  min-height: 0; 
-}
 
 /* ══════════════════════════════════════════════════════════
    MAIN CONTENT
@@ -38,25 +22,18 @@ html, body { height: 100%; overflow: hidden; }
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 1200px; /* Un poco más amplio ahora que no hay sidebar */
+  max-width: 1060px;
   width: 100%;
-  margin: 0 auto; /* Centra el contenido si la pantalla es muy grande */
 }
 
-/* ── Banner de Bienvenida y Cargo ──────────────────────────── */
-.welcome-banner {
+/* ── Encabezado de página ─────────────────────────────────── */
+.page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 20px 24px;
-  background: var(--surface-1);
-  border: 1px solid var(--border-1);
-  border-radius: var(--r-lg);
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
 }
-
-.wb-user { flex: 1; min-width: 200px; }
 
 .page-title {
   font-size: 24px;
@@ -64,15 +41,14 @@ html, body { height: 100%; overflow: hidden; }
   color: var(--text-primary);
   line-height: 1.2;
   letter-spacing: -.3px;
-  margin-bottom: 4px;
 }
-
 .page-title .greeting-word { color: var(--text-muted); font-weight: 400; }
 .page-title .greeting-name { color: var(--text-primary); }
 
 .page-subtitle {
   font-size: 13px;
   color: var(--text-muted);
+  margin-top: 3px;
 }
 .page-subtitle .date-highlight {
   color: var(--amber);
@@ -81,29 +57,7 @@ html, body { height: 100%; overflow: hidden; }
   opacity: .9;
 }
 
-.wb-cargo {
-  flex: 1;
-  min-width: 250px;
-  padding: 0 20px;
-  border-left: 1px solid var(--border-2);
-  border-right: 1px solid var(--border-2);
-}
-
-.wb-cargo .cargo-role {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.wb-cargo .cargo-unit {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.wb-actions { flex-shrink: 0; }
+.page-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
 
 /* ══════════════════════════════════════════════════════════
    STAT CARDS
@@ -122,10 +76,7 @@ html, body { height: 100%; overflow: hidden; }
   border-left: 3px solid var(--border-1);
   transition: border-color var(--t-fast), transform var(--t-fast);
 }
-.stat-card:hover {
-  border-color: var(--border-3);
-  transform: translateY(-1px);
-}
+.stat-card:hover { border-color: var(--border-3); transform: translateY(-1px); }
 
 .stat-card.accent-default { border-left-color: var(--border-3); }
 .stat-card.accent-green   { border-left-color: var(--green); }
@@ -193,21 +144,15 @@ html, body { height: 100%; overflow: hidden; }
 .prio-low    { color: var(--green); font-weight: 500; }
 .prio-other  { color: var(--text-subtle); }
 
-/* ══ Responsive ═══════════════════════════════════════════ */
+/* ══ Responsive ════════════════════════════════════════════ */
 @media (max-width: 800px) {
-  html, body { overflow: auto; }
-  .app-shell { height: 100dvh; }
-  .body-layout { overflow: auto; }
   .main-content { overflow: visible; }
-
   .page-wrapper { padding: 16px; gap: 14px; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  
-  .welcome-banner { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .wb-cargo { border-left: none; border-right: none; border-top: 1px solid var(--border-2); padding: 12px 0 0; width: 100%; }
+  .stats-grid   { grid-template-columns: repeat(2, 1fr); }
+  .page-title   { font-size: 20px; }
+  .page-actions .btn span { display: none; }
 }
 
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
-  .wb-actions .btn span { display: none; } /* Oculta el texto del botón en móviles muy pequeños */
 }

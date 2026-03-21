@@ -56,6 +56,7 @@ function fechaLarga($f) {
   $ts = strtotime($f);
   return $dias[date('w',$ts)] . ', ' . date('j',$ts) . ' de ' . $meses[(int)date('n',$ts)] . ' de ' . date('Y',$ts);
 }
+
 function estadoClass($e) {
   $m = array('completada'=>'status-done','completado'=>'status-done','done'=>'status-done',
              'pendiente'=>'status-pending','pending'=>'status-pending',
@@ -63,6 +64,7 @@ function estadoClass($e) {
              'cancelada'=>'status-cancel','cancelado'=>'status-cancel');
   return isset($m[strtolower(trim($e))]) ? $m[strtolower(trim($e))] : 'status-none';
 }
+
 function prioClass($p) {
   $m = array('alta'=>'prio-high','high'=>'prio-high','media'=>'prio-medium','medium'=>'prio-medium',
              'baja'=>'prio-low','low'=>'prio-low');
@@ -71,7 +73,7 @@ function prioClass($p) {
 
 /* Contadores */
 $cntTotal = count($misActividades);
-$cntComp = 0; $cntPend = 0;
+$cntComp  = 0; $cntPend = 0;
 foreach ($misActividades as $a) {
   $e = strtolower(trim($a['estado']));
   if (in_array($e, array('completada','completado','done'))) $cntComp++;
@@ -86,6 +88,7 @@ $cntCurso = max(0, $cntTotal - $cntComp - $cntPend);
   <title>Intranet | Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="static/css/theme.css">
+  <link rel="stylesheet" href="static/css/sidebar.css">
   <link rel="stylesheet" href="static/css/dashboard.css">
   <link rel="icon" type="image/x-icon" href="static/img/logo.png">
 </head>
@@ -93,38 +96,26 @@ $cntCurso = max(0, $cntTotal - $cntComp - $cntPend);
 
 <div class="app-shell">
 
-  <?php require __DIR__ . '/inc/header.php'; ?>
-
-  <div class="body-layout">
+  <?php require __DIR__ . '/inc/sidebar.php'; ?>
+  <!-- sidebar.php abre .body-layout e incluye el aside.sidebar -->
     <main class="main-content">
       <div class="page-wrapper">
 
-        <div class="welcome-banner card">
-          <div class="wb-user">
+        <!-- ── Encabezado de página ──────────────────────── -->
+        <div class="page-header">
+          <div>
             <h1 class="page-title">
               <span class="greeting-word">Hola, </span>
               <span class="greeting-name"><?php echo h($nombre); ?></span>
             </h1>
             <div class="page-subtitle">
               <span class="date-highlight"><?php echo h(fechaLarga($hoy)); ?></span>
+              &nbsp;·&nbsp; Dashboard de actividades
             </div>
           </div>
-
-          <?php if ($cargoVigente): ?>
-          <div class="wb-cargo">
-            <div class="cargo-role">
-              <?php echo h($cargoVigente['cargo_nombre']); ?>
-              <span class="badge badge-blue"><?php echo h(strtoupper($cargoVigente['tipo'])); ?></span>
-            </div>
-            <div class="cargo-unit">
-              <?php echo h($cargoVigente['direccion_nombre']); ?> &bull; <?php echo h($cargoVigente['unidad_nombre']); ?>
-            </div>
-          </div>
-          <?php endif; ?>
-
-          <div class="wb-actions">
+          <div class="page-actions">
             <a class="btn btn-primary btn-sm" href="actividades_form.php">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
               <span>Registrar Actividad</span>
@@ -132,6 +123,7 @@ $cntCurso = max(0, $cntTotal - $cntComp - $cntPend);
           </div>
         </div>
 
+        <!-- ── Stats ─────────────────────────────────────── -->
         <div class="stats-grid">
           <div class="stat-card accent-default">
             <div class="stat-label">Total hoy</div>
@@ -155,6 +147,7 @@ $cntCurso = max(0, $cntTotal - $cntComp - $cntPend);
           </div>
         </div>
 
+        <!-- ── Actividades del día ────────────────────────── -->
         <div class="activities-panel card">
           <div class="panel-header card-header">
             <div class="panel-title card-title">
@@ -221,7 +214,8 @@ $cntCurso = max(0, $cntTotal - $cntComp - $cntPend);
 
       </div>
     </main>
-  </div>
-</div>
+  </div><!-- /body-layout (opened by sidebar.php) -->
+</div><!-- /app-shell -->
+
 </body>
 </html>
