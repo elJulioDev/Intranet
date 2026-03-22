@@ -6,18 +6,18 @@
 /* ── Layout raíz: ocupa exactamente el viewport ──────────── */
 html, body {
   height: 100%;
-  overflow: hidden; /* evita scroll en desktop */
+  overflow: hidden;
 }
 
 @media (max-width: 480px) {
-  html, body { overflow: auto; } /* scroll permitido en móvil pequeño */
+  html, body { overflow: auto; }
 }
 
 .login-page {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between; /* logo+form al centro, footer abajo */
+  justify-content: space-between;
   height: 100%;
   min-height: 100vh;
   padding: 28px 16px 0;
@@ -44,7 +44,7 @@ html, body {
 .login-logo img {
   display: block;
   width: auto;
-  height: 52px;          /* altura fija; ancho proporcional (1722:810 ≈ 2.12:1 → ~110px) */
+  height: 52px;
   object-fit: contain;
   opacity: .92;
   transition: opacity .15s ease;
@@ -208,41 +208,13 @@ html, body {
 
 .login-bottom .sep { color: var(--border-3); }
 
-/* Botón toggle tema */
-.login-theme-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: var(--text-subtle);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  font-family: var(--font-sans);
-  transition: color .12s ease;
-}
-
-.login-theme-btn:hover { color: var(--blue); }
-
-.login-theme-btn svg {
-  width: 12px;
-  height: 12px;
-  fill: currentColor;
-  flex-shrink: 0;
-}
-
 /* ── Responsive móvil ─────────────────────────────────────── */
 @media (max-width: 480px) {
   .login-page { padding-top: 24px; }
-
   .login-logo img { height: 44px; }
-
   .login-heading { font-size: 18px; margin-bottom: 14px; }
-
   .login-card,
   .login-footer-card { max-width: 100%; }
-
   .login-bottom {
     flex-direction: column;
     align-items: center;

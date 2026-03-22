@@ -78,9 +78,6 @@ html, body { height: 100%; overflow: hidden; }
 }
 .topbar-hamburger:hover { background: var(--surface-2); color: var(--text-primary); }
 
-/* Hamburger → X cuando está abierto */
-.topbar-hamburger.is-open svg { /* se rota con JS */ }
-
 /* ── Body layout ──────────────────────────────────────────── */
 .body-layout {
   display: flex;

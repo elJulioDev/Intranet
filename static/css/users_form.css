@@ -3,78 +3,29 @@
    Extiende theme.css. No redefinir variables base.
    ════════════════════════════════════════════════════════════ */
 
-/* ── Page shell ─────────────────────────────────────────────── */
-.uf-page {
-  min-height: 100vh;
-  background: var(--bg);
-  font-family: var(--font-sans);
-  padding: 0 0 60px;
-}
-
-/* ── Topbar breadcrumb ──────────────────────────────────────── */
-.uf-topbar {
-  height: 52px;
-  background: var(--topbar-bg);
-  border-bottom: 1px solid var(--topbar-border);
+/* ── Integración con el shell de sidebar ────────────────────
+   .main-content es flex-col + align-items:center (de dashboard.css
+   o definido aquí si esta página no carga dashboard.css).
+   .uf-page actúa como el .page-wrapper del dashboard.
+   ─────────────────────────────────────────────────────────── */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
-  align-items: center;
-  padding: 0 28px;
-  gap: 10px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  flex-direction: column;
+  align-items: center;        /* centra uf-page en pantallas anchas */
+  background: var(--bg);
+  min-width: 0;
 }
 
-.uf-topbar-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-muted);
-  text-decoration: none;
-  padding: 5px 10px;
-  border-radius: var(--r);
-  border: 1px solid transparent;
-  transition: all var(--t-fast);
-}
-.uf-topbar-back:hover {
-  background: var(--surface-2);
-  border-color: var(--border-1);
-  color: var(--text-primary);
-  text-decoration: none;
-}
-.uf-topbar-back svg { flex-shrink: 0; }
-
-.uf-topbar-sep {
-  font-size: 13px;
-  color: var(--border-3);
-}
-
-.uf-topbar-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.uf-topbar-spacer { flex: 1; }
-
-.uf-topbar-meta {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-subtle);
-  background: var(--surface-2);
-  border: 1px solid var(--border-1);
-  padding: 3px 9px;
-  border-radius: 999px;
-}
-
-/* ── Wrapper ────────────────────────────────────────────────── */
-.uf-wrap {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 32px 28px 0;
+/* uf-page es el wrapper de todo el contenido de la página */
+.uf-page {
+  padding: 28px 36px 64px;
+  width: 100%;
+  max-width: 1280px;          /* igual que .page-wrapper del dashboard */
+  box-sizing: border-box;
+  font-family: var(--font-sans);
 }
 
 /* ── Page heading ───────────────────────────────────────────── */
@@ -94,8 +45,8 @@
 }
 
 .uf-heading-icon {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--r-md);
   background: var(--green-subtle);
   border: 1px solid var(--green-border);
@@ -107,12 +58,12 @@
 }
 
 .uf-heading-text h1 {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -.3px;
   line-height: 1.2;
-  margin: 0 0 3px;
+  margin: 0 0 4px;
 }
 
 .uf-heading-text p {
@@ -487,7 +438,7 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  padding: 18px 18px;
+  padding: 18px;
   background: var(--surface-1);
   border: 1px solid var(--border-1);
   border-radius: var(--r-lg);
@@ -577,69 +528,81 @@
   margin-top: 6px;
 }
 
-/* ── Integración con sidebar — replica el patrón de dashboard.php ── */
- .main-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg);
-  min-width: 0;
-}
-
-/* uf-page actúa igual que .page-wrapper del dashboard */
-.uf-page {
-  padding: 28px 32px 64px;
-  width: 100%;
-  max-width: 1060px;
-}
-
-/* Anula padding extra de uf-wrap (ahora uf-page es el wrapper único) */
+/* ── Clases legacy que algunos PHP heredados usan ─────────── */
 .uf-wrap {
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
-/* Heading — tamaño y espaciado consistente con el dashboard */
-.uf-heading {
-  margin-top: 0 !important;
-  margin-bottom: 28px !important;
-}
-.uf-heading-text h1 {
-  font-size: 24px !important;
-  letter-spacing: -.3px !important;
-}
-.uf-heading-text p {
-  font-size: 13px !important;
-  margin-top: 4px !important;
-}
-.uf-heading-icon {
-  width: 48px !important;
-  height: 48px !important;
+.uf-topbar {
+  height: 52px;
+  background: var(--topbar-bg);
+  border-bottom: 1px solid var(--topbar-border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
 }
 
-/* Gap entre secciones igual que el dashboard */
-.uf-form { gap: 16px !important; }
-
-@media (max-width: 800px) {
-  .uf-page { padding: 20px 20px 48px; }
+.uf-topbar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  transition: all var(--t-fast);
 }
-@media (max-width: 480px) {
-  .uf-page { padding: 16px 14px 40px; }
+.uf-topbar-back:hover {
+  background: var(--surface-2);
+  border-color: var(--border-1);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.uf-topbar-back svg { flex-shrink: 0; }
+.uf-topbar-sep { font-size: 13px; color: var(--border-3); }
+.uf-topbar-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.uf-topbar-spacer { flex: 1; }
+.uf-topbar-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-subtle);
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+  padding: 3px 9px;
+  border-radius: 999px;
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .uf-page { padding: 24px 28px 56px; }
+}
+
+@media (max-width: 800px) {
+  .main-content { align-items: stretch; overflow: visible; }
+  .uf-page { padding: 20px 20px 48px; }
+}
+
 @media (max-width: 720px) {
-  .uf-wrap { padding: 20px 16px 0; }
   .uf-grid-2,
   .uf-grid-3 { grid-template-columns: 1fr; }
   .uf-col-full { grid-column: auto; }
   .uf-heading-text h1 { font-size: 18px; }
-  .uf-topbar { padding: 0 16px; }
   .uf-footer { flex-direction: column; align-items: stretch; }
   .uf-footer-actions { flex-direction: column; }
   .uf-btn-submit,
   .uf-btn-cancel { justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .uf-page { padding: 16px 14px 40px; }
 }
