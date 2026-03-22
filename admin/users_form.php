@@ -1,5 +1,5 @@
 <?php
-// intranet/admin/users_form.php (PHP 5.6) — con header global
+// intranet/admin/users_form.php (PHP 5.6) — con sidebar global
 require __DIR__ . '/_guard.php';
 
 /* ── Helpers ────────────────────────────────────────────── */
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Admin · Crear Usuario</title>
+  <title>Admin | Crear Usuario</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="../static/css/theme.css">
   <link rel="stylesheet" href="../static/css/users_form.css">
@@ -142,279 +142,293 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-<!-- ══ HEADER GLOBAL ══════════════════════════════════════════ -->
-<?php require __DIR__ . '/../inc/header.php'; ?>
-<!-- ════════════════════════════════════════════════════════════ -->
+<div class="app-shell">
 
-<div class="uf-page" style="padding-top:0;"><!-- uf-page sin padding-top porque header.php lo pone -->
+  <?php require __DIR__ . '/../inc/sidebar.php'; ?>
+  <!-- sidebar.php abre .body-layout e incluye el aside.sidebar -->
 
-  <div class="uf-wrap">
+  <main class="main-content">
+    <div class="uf-page">
 
-    <!-- ── Heading ──────────────────────────────────────────── -->
-    <div class="uf-heading" style="margin-top:28px;">
-      <div class="uf-heading-left">
-        <div class="uf-heading-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <line x1="19" y1="8" x2="19" y2="14"/>
-            <line x1="16" y1="11" x2="22" y2="11"/>
-          </svg>
-        </div>
-        <div class="uf-heading-text">
-          <h1>Crear funcionario</h1>
-          <p>Registra un nuevo usuario en el sistema de gestión interna.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Alerts -->
-    <?php if ($err): ?>
-    <div class="uf-alert uf-alert-error">
-      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm-.75 3.25h1.5v4h-1.5v-4zm0 5h1.5v1.5h-1.5v-1.5z"/>
-      </svg>
-      <?php echo h($err); ?>
-    </div>
-    <?php endif; ?>
-    <?php if ($ok): ?>
-    <div class="uf-alert uf-alert-success">
-      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm3.03 3.97-3.78 5.03-1.78-1.78-1.06 1.06 2.5 2.5.53.53.53-.7 4.32-5.75-1.26-.89z"/>
-      </svg>
-      <?php echo h($ok); ?>
-    </div>
-    <?php endif; ?>
-
-    <form method="post" autocomplete="off" class="uf-form">
-      <input type="hidden" name="csrf" value="<?php echo h(csrf_token()); ?>">
-
-      <!-- ════ Sección 1: Identidad ════ -->
-      <div class="uf-section">
-        <div class="uf-section-header">
-          <div class="uf-section-icon blue">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
+      <!-- ── Heading ──────────────────────────────────────────── -->
+      <div class="uf-heading">
+        <div class="uf-heading-left">
+          <div class="uf-heading-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <line x1="19" y1="8" x2="19" y2="14"/>
+              <line x1="16" y1="11" x2="22" y2="11"/>
             </svg>
           </div>
-          <span class="uf-section-title">Datos personales</span>
-          <span class="uf-section-subtitle">Información de identificación</span>
-        </div>
-        <div class="uf-section-body">
-          <div class="uf-grid uf-grid-2">
-            <div class="uf-field">
-              <label class="uf-label" for="f-rut">RUT <span class="uf-required">*</span></label>
-              <input class="uf-input" id="f-rut" name="rut" value="<?php echo h($data['rut']); ?>" placeholder="12345678K" autocomplete="off" required>
-              <span class="uf-hint">Sin puntos ni guión. Se normaliza automáticamente.</span>
-            </div>
-            <div class="uf-field"></div>
-            <div class="uf-field">
-              <label class="uf-label" for="f-nombres">Nombres <span class="uf-required">*</span></label>
-              <input class="uf-input" id="f-nombres" name="nombres" value="<?php echo h($data['nombres']); ?>" placeholder="Juan Andrés" required>
-            </div>
-            <div class="uf-field">
-              <label class="uf-label" for="f-apellidos">Apellidos <span class="uf-required">*</span></label>
-              <input class="uf-input" id="f-apellidos" name="apellidos" value="<?php echo h($data['apellidos']); ?>" placeholder="Pérez González" required>
-            </div>
-            <div class="uf-field">
-              <label class="uf-label" for="f-email">Email</label>
-              <input class="uf-input" id="f-email" name="email" type="email" value="<?php echo h($data['email']); ?>" placeholder="usuario@municipio.cl">
-            </div>
-            <div class="uf-field">
-              <label class="uf-label" for="f-tel">Teléfono</label>
-              <input class="uf-input" id="f-tel" name="telefono" value="<?php echo h($data['telefono']); ?>" placeholder="+56 9 1234 5678">
-            </div>
-            <div class="uf-field uf-col-full">
-              <label class="uf-label" for="f-dom">Domicilio</label>
-              <input class="uf-input" id="f-dom" name="direccion_dom" value="<?php echo h($data['direccion_dom']); ?>" placeholder="Calle Nombre 123, Comuna">
-            </div>
+          <div class="uf-heading-text">
+            <h1>Crear funcionario</h1>
+            <p>Registra un nuevo usuario en el sistema de gestión interna.</p>
           </div>
         </div>
       </div>
 
-      <!-- ════ Sección 2: Acceso ════ -->
-      <div class="uf-section">
-        <div class="uf-section-header">
-          <div class="uf-section-icon green">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-          </div>
-          <span class="uf-section-title">Credenciales y acceso</span>
-          <span class="uf-section-subtitle">Clave y permisos de cuenta</span>
-        </div>
-        <div class="uf-section-body">
-          <div class="uf-grid uf-grid-2" style="margin-bottom:16px;">
-            <div class="uf-field">
-              <label class="uf-label" for="f-pw">Clave <span class="uf-required">*</span></label>
-              <div class="uf-input-pw-wrap">
-                <input class="uf-input" id="f-pw" name="password" type="password" placeholder="••••••••" autocomplete="new-password" required>
-                <button type="button" class="uf-input-pw-toggle" onclick="togglePw('f-pw',this)" tabindex="-1">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-              </div>
-              <span class="uf-hint">Se guarda como hash bcrypt. Mínimo 3 caracteres.</span>
-            </div>
-            <div class="uf-field">
-              <label class="uf-label" for="f-pw2">Repetir clave <span class="uf-required">*</span></label>
-              <div class="uf-input-pw-wrap">
-                <input class="uf-input" id="f-pw2" name="password2" type="password" placeholder="••••••••" autocomplete="new-password" required>
-                <button type="button" class="uf-input-pw-toggle" onclick="togglePw('f-pw2',this)" tabindex="-1">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="uf-toggle-row">
-            <div class="uf-toggle-info">
-              <span class="uf-toggle-name">Cuenta activa</span>
-              <span class="uf-toggle-desc">El funcionario puede iniciar sesión.</span>
-            </div>
-            <label class="uf-toggle">
-              <input type="checkbox" name="activo" value="1" <?php echo ((int)$data['activo']===1?'checked':''); ?>>
-              <span class="uf-toggle-track"></span>
-            </label>
-          </div>
-          <div class="uf-toggle-row">
-            <div class="uf-toggle-info">
-              <span class="uf-toggle-name">Superadministrador</span>
-              <span class="uf-toggle-desc">Acceso completo al panel de administración.</span>
-            </div>
-            <label class="uf-toggle is-amber">
-              <input type="checkbox" name="is_superadmin" value="1" <?php echo ((int)$data['is_superadmin']===1?'checked':''); ?>>
-              <span class="uf-toggle-track"></span>
-            </label>
-          </div>
-        </div>
+      <!-- Alerts -->
+      <?php if ($err): ?>
+      <div class="uf-alert uf-alert-error">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm-.75 3.25h1.5v4h-1.5v-4zm0 5h1.5v1.5h-1.5v-1.5z"/>
+        </svg>
+        <?php echo h($err); ?>
       </div>
+      <?php endif; ?>
+      <?php if ($ok): ?>
+      <div class="uf-alert uf-alert-success">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm3.03 3.97-3.78 5.03-1.78-1.78-1.06 1.06 2.5 2.5.53.53.53-.7 4.32-5.75-1.26-.89z"/>
+        </svg>
+        <?php echo h($ok); ?>
+      </div>
+      <?php endif; ?>
 
-      <!-- ════ Sección 3: Roles ════ -->
-      <div class="uf-section">
-        <div class="uf-section-header">
-          <div class="uf-section-icon purple">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>
-            </svg>
-          </div>
-          <span class="uf-section-title">Roles</span>
-          <span class="uf-section-subtitle">Opcional — define permisos RBAC</span>
-        </div>
-        <div class="uf-section-body">
-          <?php if (empty($roles)): ?>
-            <div class="uf-empty-note">
+      <form method="post" autocomplete="off" class="uf-form">
+        <input type="hidden" name="csrf" value="<?php echo h(csrf_token()); ?>">
+
+        <!-- ════ Sección 1: Identidad ════ -->
+        <div class="uf-section">
+          <div class="uf-section-header">
+            <div class="uf-section-icon blue">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
               </svg>
-              No hay roles activos en el sistema.
             </div>
-          <?php else: ?>
-            <div class="uf-roles-grid">
-              <?php foreach ($roles as $r): ?>
-                <?php $rid=(int)$r['id']; $checked=in_array((string)$rid,array_map('strval',(array)$data['roles'])); ?>
-                <label class="uf-role-item">
-                  <input type="checkbox" name="roles[]" value="<?php echo $rid; ?>" <?php echo $checked?'checked':''; ?>>
-                  <div class="uf-role-check-wrap">
-                    <div class="uf-role-check">
-                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                        <polyline points="2 6 5 9 10 3"/>
-                      </svg>
-                    </div>
-                    <span class="uf-role-label"><?php echo h($r['nombre']); ?></span>
-                  </div>
-                  <span class="uf-role-code"><?php echo h($r['codigo']); ?></span>
-                </label>
-              <?php endforeach; ?>
-            </div>
-          <?php endif; ?>
-        </div>
-      </div>
-
-      <!-- ════ Sección 4: Cargo ════ -->
-      <div class="uf-section">
-        <div class="uf-section-header">
-          <div class="uf-section-icon amber">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <rect x="2" y="7" width="20" height="14" rx="2"/>
-              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-            </svg>
+            <span class="uf-section-title">Datos personales</span>
+            <span class="uf-section-subtitle">Información de identificación</span>
           </div>
-          <span class="uf-section-title">Cargo vigente</span>
-          <span class="uf-section-subtitle">Opcional — asigna función desde hoy</span>
-        </div>
-        <div class="uf-section-body">
-          <?php if (empty($cargos)): ?>
-            <div class="uf-empty-note">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              No hay cargos disponibles.
-            </div>
-            <?php if ($cargosErr): ?><div class="uf-debug"><?php echo h($cargosErr); ?></div><?php endif; ?>
-          <?php else: ?>
+          <div class="uf-section-body">
             <div class="uf-grid uf-grid-2">
-              <div class="uf-field uf-col-full uf-cargo-select-wrap">
-                <label class="uf-label" for="f-cargo">Cargo</label>
-                <div class="uf-select-wrap">
-                  <select class="uf-select" id="f-cargo" name="cargo_id">
-                    <option value="0">— Sin asignar —</option>
-                    <?php foreach ($cargos as $c): ?>
-                      <option value="<?php echo (int)$c['id']; ?>" <?php echo ((int)$data['cargo_id']===(int)$c['id']?'selected':''); ?>><?php echo h($c['label']); ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
+              <div class="uf-field">
+                <label class="uf-label" for="f-rut">RUT <span class="uf-required">*</span></label>
+                <input class="uf-input" id="f-rut" name="rut" value="<?php echo h($data['rut']); ?>" placeholder="12345678K" autocomplete="off" required>
+                <span class="uf-hint">Sin puntos ni guión. Se normaliza automáticamente.</span>
+              </div>
+              <div class="uf-field"></div>
+              <div class="uf-field">
+                <label class="uf-label" for="f-nombres">Nombres <span class="uf-required">*</span></label>
+                <input class="uf-input" id="f-nombres" name="nombres" value="<?php echo h($data['nombres']); ?>" placeholder="Juan Andrés" required>
+              </div>
+              <div class="uf-field">
+                <label class="uf-label" for="f-apellidos">Apellidos <span class="uf-required">*</span></label>
+                <input class="uf-input" id="f-apellidos" name="apellidos" value="<?php echo h($data['apellidos']); ?>" placeholder="Pérez González" required>
+              </div>
+              <div class="uf-field">
+                <label class="uf-label" for="f-email">Email</label>
+                <input class="uf-input" id="f-email" name="email" type="email" value="<?php echo h($data['email']); ?>" placeholder="usuario@municipio.cl">
+              </div>
+              <div class="uf-field">
+                <label class="uf-label" for="f-tel">Teléfono</label>
+                <input class="uf-input" id="f-tel" name="telefono" value="<?php echo h($data['telefono']); ?>" placeholder="+56 9 1234 5678">
               </div>
               <div class="uf-field uf-col-full">
-                <label class="uf-label">Tipo de vinculación</label>
-                <div class="uf-tipo-row">
-                  <?php foreach (array('titular','subrogante','suplente') as $tipo): ?>
-                    <div class="uf-tipo-opt">
-                      <input type="radio" name="cargo_tipo" id="tipo-<?php echo $tipo; ?>" value="<?php echo $tipo; ?>" <?php echo ($data['cargo_tipo']===$tipo?'checked':''); ?>>
-                      <label class="uf-tipo-label" for="tipo-<?php echo $tipo; ?>"><?php echo ucfirst($tipo); ?></label>
-                    </div>
-                  <?php endforeach; ?>
-                </div>
-              </div>
-              <div class="uf-field">
-                <label class="uf-label" for="f-desde">Desde</label>
-                <input class="uf-input" id="f-desde" name="fecha_desde" type="date" value="<?php echo h($data['fecha_desde']); ?>">
-              </div>
-              <div class="uf-field">
-                <label class="uf-label" for="f-hasta">Hasta <span style="color:var(--text-subtle);font-weight:400;">(opcional)</span></label>
-                <input class="uf-input" id="f-hasta" name="fecha_hasta" type="date" value="<?php echo h($data['fecha_hasta']); ?>">
-                <span class="uf-hint">Dejar vacío si el cargo es indefinido.</span>
+                <label class="uf-label" for="f-dom">Domicilio</label>
+                <input class="uf-input" id="f-dom" name="direccion_dom" value="<?php echo h($data['direccion_dom']); ?>" placeholder="Calle Nombre 123, Comuna">
               </div>
             </div>
-          <?php endif; ?>
+          </div>
         </div>
-      </div>
 
-      <!-- ════ Footer ════ -->
-      <div class="uf-footer">
-        <div class="uf-footer-info">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm-.75 3.25h1.5v4h-1.5v-4zm0 5h1.5v1.5h-1.5v-1.5z"/>
-          </svg>
-          Los campos <span style="color:var(--red);font-weight:700;margin:0 2px;">*</span> son obligatorios.
+        <!-- ════ Sección 2: Acceso ════ -->
+        <div class="uf-section">
+          <div class="uf-section-header">
+            <div class="uf-section-icon green">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <span class="uf-section-title">Credenciales y acceso</span>
+            <span class="uf-section-subtitle">Clave y permisos de cuenta</span>
+          </div>
+          <div class="uf-section-body">
+            <div class="uf-grid uf-grid-2" style="align-items: start;">
+              
+              <div class="uf-field">
+                <label class="uf-label" for="f-pw">Clave <span class="uf-required">*</span></label>
+                <div class="uf-input-pw-wrap">
+                  <input class="uf-input" id="f-pw" name="password" type="password" placeholder="••••••••" autocomplete="new-password" required>
+                  <button type="button" class="uf-input-pw-toggle" onclick="togglePw('f-pw',this)" tabindex="-1">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
+                <span class="uf-hint">Se guarda como hash bcrypt. Mínimo 3 caracteres.</span>
+              </div>
+
+              <div class="uf-field">
+                <label class="uf-label" style="visibility: hidden;">Estado</label>
+                <div class="uf-toggle-row" style="border: none; padding: 4px 0 0 0;">
+                  <div class="uf-toggle-info">
+                    <span class="uf-toggle-name">Cuenta activa</span>
+                    <span class="uf-toggle-desc">El funcionario puede iniciar sesión.</span>
+                  </div>
+                  <label class="uf-toggle">
+                    <input type="checkbox" name="activo" value="1" <?php echo ((int)$data['activo']===1?'checked':''); ?>>
+                    <span class="uf-toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="uf-field">
+                <label class="uf-label" for="f-pw2">Repetir clave <span class="uf-required">*</span></label>
+                <div class="uf-input-pw-wrap">
+                  <input class="uf-input" id="f-pw2" name="password2" type="password" placeholder="••••••••" autocomplete="new-password" required>
+                  <button type="button" class="uf-input-pw-toggle" onclick="togglePw('f-pw2',this)" tabindex="-1">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="uf-field">
+                <label class="uf-label" style="visibility: hidden;">Permisos</label>
+                <div class="uf-toggle-row" style="border: none; padding: 4px 0 0 0;">
+                  <div class="uf-toggle-info">
+                    <span class="uf-toggle-name">Superadministrador</span>
+                    <span class="uf-toggle-desc">Acceso completo al panel de administración.</span>
+                  </div>
+                  <label class="uf-toggle is-amber">
+                    <input type="checkbox" name="is_superadmin" value="1" <?php echo ((int)$data['is_superadmin']===1?'checked':''); ?>>
+                    <span class="uf-toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
-        <div class="uf-footer-actions">
-          <a class="uf-btn-cancel" href="index.php">Cancelar</a>
-          <button class="uf-btn-submit" type="submit">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <polyline points="20 6 9 17 4 12"/>
+
+        <!-- ════ Sección 3: Roles ════ -->
+        <div class="uf-section">
+          <div class="uf-section-header">
+            <div class="uf-section-icon purple">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>
+              </svg>
+            </div>
+            <span class="uf-section-title">Roles</span>
+            <span class="uf-section-subtitle">Opcional — define permisos RBAC</span>
+          </div>
+          <div class="uf-section-body">
+            <?php if (empty($roles)): ?>
+              <div class="uf-empty-note">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                No hay roles activos en el sistema.
+              </div>
+            <?php else: ?>
+              <div class="uf-roles-grid">
+                <?php foreach ($roles as $r): ?>
+                  <?php $rid=(int)$r['id']; $checked=in_array((string)$rid,array_map('strval',(array)$data['roles'])); ?>
+                  <label class="uf-role-item">
+                    <input type="checkbox" name="roles[]" value="<?php echo $rid; ?>" <?php echo $checked?'checked':''; ?>>
+                    <div class="uf-role-check-wrap">
+                      <div class="uf-role-check">
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                          <polyline points="2 6 5 9 10 3"/>
+                        </svg>
+                      </div>
+                      <span class="uf-role-label"><?php echo h($r['nombre']); ?></span>
+                    </div>
+                    <span class="uf-role-code"><?php echo h($r['codigo']); ?></span>
+                  </label>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <!-- ════ Sección 4: Cargo ════ -->
+        <div class="uf-section">
+          <div class="uf-section-header">
+            <div class="uf-section-icon amber">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              </svg>
+            </div>
+            <span class="uf-section-title">Cargo vigente</span>
+            <span class="uf-section-subtitle">Opcional — asigna función desde hoy</span>
+          </div>
+          <div class="uf-section-body">
+            <?php if (empty($cargos)): ?>
+              <div class="uf-empty-note">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                No hay cargos disponibles.
+              </div>
+              <?php if ($cargosErr): ?><div class="uf-debug"><?php echo h($cargosErr); ?></div><?php endif; ?>
+            <?php else: ?>
+              <div class="uf-grid uf-grid-2">
+                <div class="uf-field uf-col-full uf-cargo-select-wrap">
+                  <label class="uf-label" for="f-cargo">Cargo</label>
+                  <div class="uf-select-wrap">
+                    <select class="uf-select" id="f-cargo" name="cargo_id">
+                      <option value="0">— Sin asignar —</option>
+                      <?php foreach ($cargos as $c): ?>
+                        <option value="<?php echo (int)$c['id']; ?>" <?php echo ((int)$data['cargo_id']===(int)$c['id']?'selected':''); ?>><?php echo h($c['label']); ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="uf-field uf-col-full">
+                  <label class="uf-label">Tipo de vinculación</label>
+                  <div class="uf-tipo-row">
+                    <?php foreach (array('titular','subrogante','suplente') as $tipo): ?>
+                      <div class="uf-tipo-opt">
+                        <input type="radio" name="cargo_tipo" id="tipo-<?php echo $tipo; ?>" value="<?php echo $tipo; ?>" <?php echo ($data['cargo_tipo']===$tipo?'checked':''); ?>>
+                        <label class="uf-tipo-label" for="tipo-<?php echo $tipo; ?>"><?php echo ucfirst($tipo); ?></label>
+                      </div>
+                    <?php endforeach; ?>
+                  </div>
+                </div>
+                <div class="uf-field">
+                  <label class="uf-label" for="f-desde">Desde</label>
+                  <input class="uf-input" id="f-desde" name="fecha_desde" type="date" value="<?php echo h($data['fecha_desde']); ?>">
+                </div>
+                <div class="uf-field">
+                  <label class="uf-label" for="f-hasta">Hasta <span style="color:var(--text-subtle);font-weight:400;">(opcional)</span></label>
+                  <input class="uf-input" id="f-hasta" name="fecha_hasta" type="date" value="<?php echo h($data['fecha_hasta']); ?>">
+                  <span class="uf-hint">Dejar vacío si el cargo es indefinido.</span>
+                </div>
+              </div>
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <!-- ════ Footer ════ -->
+        <div class="uf-footer">
+          <div class="uf-footer-info">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm-.75 3.25h1.5v4h-1.5v-4zm0 5h1.5v1.5h-1.5v-1.5z"/>
             </svg>
-            Crear funcionario
-          </button>
+            Los campos <span style="color:var(--red);font-weight:700;margin:0 2px;">*</span> son obligatorios.
+          </div>
+          <div class="uf-footer-actions">
+            <a class="uf-btn-cancel" href="index.php">Cancelar</a>
+            <button class="uf-btn-submit" type="submit">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Crear funcionario
+            </button>
+          </div>
         </div>
-      </div>
 
-    </form>
-  </div>
-</div><!-- /.uf-page -->
+      </form>
+    </div><!-- /.uf-page -->
+  </main>
+
+  </div><!-- /body-layout (abierto por sidebar.php) -->
+</div><!-- /app-shell -->
 
 <script>
 function togglePw(id, btn) {

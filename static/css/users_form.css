@@ -577,6 +577,59 @@
   margin-top: 6px;
 }
 
+/* ── Integración con sidebar — replica el patrón de dashboard.php ── */
+ .main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  min-width: 0;
+}
+
+/* uf-page actúa igual que .page-wrapper del dashboard */
+.uf-page {
+  padding: 28px 32px 64px;
+  width: 100%;
+  max-width: 1060px;
+}
+
+/* Anula padding extra de uf-wrap (ahora uf-page es el wrapper único) */
+.uf-wrap {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Heading — tamaño y espaciado consistente con el dashboard */
+.uf-heading {
+  margin-top: 0 !important;
+  margin-bottom: 28px !important;
+}
+.uf-heading-text h1 {
+  font-size: 24px !important;
+  letter-spacing: -.3px !important;
+}
+.uf-heading-text p {
+  font-size: 13px !important;
+  margin-top: 4px !important;
+}
+.uf-heading-icon {
+  width: 48px !important;
+  height: 48px !important;
+}
+
+/* Gap entre secciones igual que el dashboard */
+.uf-form { gap: 16px !important; }
+
+@media (max-width: 800px) {
+  .uf-page { padding: 20px 20px 48px; }
+}
+@media (max-width: 480px) {
+  .uf-page { padding: 16px 14px 40px; }
+}
+
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 720px) {
   .uf-wrap { padding: 20px 16px 0; }
