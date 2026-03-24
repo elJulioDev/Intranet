@@ -13,7 +13,9 @@ html, body { height: 100%; overflow: hidden; }
   overflow: hidden;
 }
 
-/* ── Topbar ───────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   TOPBAR
+   ══════════════════════════════════════════════════════════ */
 .topbar {
   height: 52px;
   background: var(--topbar-bg);
@@ -21,7 +23,7 @@ html, body { height: 100%; overflow: hidden; }
   display: flex;
   align-items: center;
   padding: 0 20px;
-  gap: 14px;
+  gap: 12px;
   flex-shrink: 0;
   z-index: 200;
   -webkit-backdrop-filter: blur(10px);
@@ -60,23 +62,43 @@ html, body { height: 100%; overflow: hidden; }
 
 /* Separador y nombre organización */
 .topbar-sep { width: 1px; height: 20px; background: var(--border-1); flex-shrink: 0; }
-.topbar-org { font-size: 13px; color: var(--text-subtle); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar-org {
+  font-size: 13px;
+  color: var(--text-subtle);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-/* Hamburger */
+/* ── Info usuario en topbar (no se usa) ─────────────────── */
+.topbar-user-mob  { display: none; }
+.topbar-avatar    { display: none; }
+.topbar-user-name { display: none; }
+
+/* ── Hamburger ────────────────────────────────────────────── */
 .topbar-hamburger {
   display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  color: var(--text-muted);
-  border-radius: var(--r);
-  transition: background var(--t-fast), color var(--t-fast);
-  flex-shrink: 0;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 38px;
+  height: 38px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
 }
-.topbar-hamburger:hover { background: var(--surface-2); color: var(--text-primary); }
+.topbar-hamburger:hover {
+  background: var(--surface-3);
+  border-color: var(--border-3);
+  color: var(--text-primary);
+}
 
 /* ── Body layout ──────────────────────────────────────────── */
 .body-layout {
@@ -113,30 +135,57 @@ html, body { height: 100%; overflow: hidden; }
           backdrop-filter: blur(2px);
 }
 
-/* Scroll interno */
-.sidebar-scroll {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-bottom: 4px;
+/* ══════════════════════════════════════════════════════════
+   SIDEBAR HEADER — Siempre visible, fijo arriba
+   Contiene: botón cerrar + perfil + cargo
+   ══════════════════════════════════════════════════════════ */
+.sidebar-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-1);
+  background: var(--sidebar-bg);
+  position: relative; /* para posicionar el botón X */
 }
 
-/* Footer siempre visible */
-.sidebar-footer {
+/* ── Botón cerrar (X) — solo visible en móvil ────────────── */
+.sidebar-close-btn {
+  display: none; /* visible solo en móvil via media query */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+  z-index: 10;
+  padding: 0;
   flex-shrink: 0;
-  border-top: 1px solid var(--border-1);
-  padding: 6px 0;
-  background: var(--sidebar-bg);
+}
+.sidebar-close-btn:hover {
+  background: var(--red-subtle);
+  border-color: var(--red-border);
+  color: var(--red);
 }
 
 /* ── Profile Block ────────────────────────────────────────── */
 .profile-block {
   padding: 16px 14px 12px;
   background: linear-gradient(180deg, #12181f 0%, var(--sidebar-bg) 100%);
-  border-bottom: 1px solid var(--border-1);
 }
 
-.profile-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  /* dejar espacio para el botón X en móvil */
+  padding-right: 38px;
+}
 
 .avatar {
   width: 40px;
@@ -179,8 +228,7 @@ html, body { height: 100%; overflow: hidden; }
 
 /* ── Cargo Block ──────────────────────────────────────────── */
 .cargo-block {
-  padding: 10px 14px 11px;
-  border-bottom: 1px solid var(--border-2);
+  padding: 10px 14px 13px;
   background: rgba(255,255,255,.015);
 }
 
@@ -226,6 +274,16 @@ html, body { height: 100%; overflow: hidden; }
   font-size: 10px;
   color: var(--text-subtle);
   margin-top: 4px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SIDEBAR SCROLL — Solo la navegación hace scroll
+   ══════════════════════════════════════════════════════════ */
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 4px;
 }
 
 /* ── Nav sections ─────────────────────────────────────────── */
@@ -306,32 +364,67 @@ html, body { height: 100%; overflow: hidden; }
 /* Separador */
 .nav-sep { height: 1px; background: var(--border-2); margin: 4px 14px; }
 
+/* ══════════════════════════════════════════════════════════
+   SIDEBAR FOOTER — Siempre visible al fondo
+   ══════════════════════════════════════════════════════════ */
+.sidebar-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-1);
+  padding: 6px 0;
+  background: var(--sidebar-bg);
+  /* Sombra sutil para indicar que hay contenido arriba */
+  box-shadow: 0 -4px 12px rgba(0,0,0,.3);
+}
+
 /* ══ Responsive ════════════════════════════════════════════ */
 @media (max-width: 800px) {
   html, body  { overflow: auto; }
   .app-shell  { height: 100dvh; }
   .body-layout { overflow: auto; }
 
+  /* Mostrar hamburger */
   .topbar-hamburger { display: flex; }
-  .topbar-org       { display: none; }
 
+  /* En móvil mostramos: logo + "Intranet Municipal" + sep + org */
+  /* El sep y org se vuelven visibles; logo-name también */
+  .topbar-logo-name { display: block; }
+  .topbar-sep       { display: block; }
+  .topbar-org       {
+    display: block;
+    font-size: 12px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Sidebar deslizable */
   .sidebar {
     position: fixed;
-    top: 0; left: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
     height: 100%;
     z-index: 300;
     transform: translateX(-100%);
     box-shadow: var(--shadow-lg);
     width: 280px;
+    transition: transform .22s cubic-bezier(.4, 0, .2, 1);
   }
   .sidebar.is-open { transform: translateX(0); }
 
-  .sidebar-overlay         { display: block; }
+  /* Mostrar overlay y botón X */
+  .sidebar-overlay           { display: block; }
   .sidebar-overlay.is-hidden { display: none; }
+  .sidebar-close-btn         { display: flex; }
+
+  /* Ajustar profile-row para que el botón X no tape el nombre */
+  .profile-row { padding-right: 42px; }
 }
 
 @media (max-width: 480px) {
-  .topbar { padding: 0 14px; gap: 10px; }
-  .topbar-logo-name { display: none; }
-  .topbar-sep       { display: none; }
+  .topbar { padding: 0 12px; gap: 8px; }
+  /* En pantallas muy pequeñas ocultamos el texto org para no saturar */
+  .topbar-org { display: none; }
+  .topbar-sep { display: none; }
 }

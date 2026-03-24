@@ -1,22 +1,6 @@
 <?php
 /**
  * inc/sidebar.php — Sidebar global de navegación · Intranet Municipal
- *
- * Uso desde cualquier página:
- *   require __DIR__ . '/inc/sidebar.php';            (desde raíz)
- *   require __DIR__ . '/../inc/sidebar.php';          (desde admin/)
- *   require __DIR__ . '/../../inc/sidebar.php';       (desde admin/marcaciones/)
- *
- * Requisito: db.php y auth.php cargados antes.
- * Salida: <link> CSS + <header.topbar> + <div.body-layout> + <aside.sidebar> (sin cerrar body-layout)
- *
- * Template de la página que lo incluye:
- *   <div class="app-shell">
- *     <?php require __DIR__ . '/inc/sidebar.php'; ?>
- *     <!-- sidebar.php abre .body-layout y pone el aside dentro -->
- *     <main class="main-content">...</main>
- *   </div><!-- /body-layout -->
- * </div><!-- /app-shell -->
  */
 
 if (session_status() !== PHP_SESSION_ACTIVE) session_start();
@@ -96,7 +80,7 @@ function _sb_h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 <!-- ══ TOPBAR ═══════════════════════════════════════════════ -->
 <header class="topbar">
   <button class="topbar-hamburger" id="hamburgerBtn" aria-label="Abrir menú" type="button">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
       <line x1="3" y1="6"  x2="21" y2="6"/>
       <line x1="3" y1="12" x2="21" y2="12"/>
       <line x1="3" y1="18" x2="21" y2="18"/>
@@ -110,18 +94,35 @@ function _sb_h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
   <div class="topbar-sep"></div>
   <span class="topbar-org">Sistema de Gestión Interna</span>
+
+  <!-- Nombre del usuario visible en topbar móvil -->
+  <div class="topbar-user-mob">
+    <div class="topbar-avatar"><?php echo _sb_h(_sb_ini($_sb_nombre)); ?></div>
+    <span class="topbar-user-name"><?php echo _sb_h($_sb_nombre); ?></span>
+  </div>
 </header>
 
-<!-- ══ BODY LAYOUT: sidebar.php opens this div; the page closes it ══ -->
+<!-- ══ BODY LAYOUT ════════════════════════════════════════ -->
 <div class="body-layout">
 
-<!-- ══ SIDEBAR ════════════════════════════════════════════ -->
+<!-- Overlay para cerrar sidebar al tocar fuera -->
 <div class="sidebar-overlay is-hidden" id="sidebarOverlay"></div>
 
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-scroll">
 
-    <!-- ── Perfil ────────────────────────────────────────── -->
+  <!-- ══ CABECERA FIJA DEL SIDEBAR ════════════════════════ -->
+  <!-- Siempre visible: perfil + cargo + botón cerrar -->
+  <div class="sidebar-header">
+
+    <!-- Botón cerrar (X) — solo visible en móvil -->
+    <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Cerrar menú" type="button">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- ── Perfil ───────────────────────────────────────── -->
     <div class="profile-block">
       <div class="profile-row">
         <div class="avatar"><?php echo _sb_h(_sb_ini($_sb_nombre)); ?></div>
@@ -143,23 +144,26 @@ function _sb_h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
     </div>
 
     <!-- ── Cargo vigente ─────────────────────────────────── -->
-    <?php if ($_sb_cargo): ?>
     <div class="cargo-block">
-      <div class="cargo-label">Cargo vigente</div>
-      <div class="cargo-role"><?php echo _sb_h($_sb_cargo['cargo_nombre']); ?></div>
-      <div class="cargo-dir"><?php echo _sb_h($_sb_cargo['direccion_nombre']); ?></div>
-      <div class="cargo-unit"><?php echo _sb_h($_sb_cargo['unidad_nombre']); ?></div>
-      <div class="cargo-dates">
-        <?php echo _sb_h($_sb_cargo['fecha_desde']); ?>
-        <?php echo $_sb_cargo['fecha_hasta'] ? ' → ' . _sb_h($_sb_cargo['fecha_hasta']) : ' → vigente'; ?>
-      </div>
+      <?php if ($_sb_cargo): ?>
+        <div class="cargo-label">Cargo vigente</div>
+        <div class="cargo-role"><?php echo _sb_h($_sb_cargo['cargo_nombre']); ?></div>
+        <div class="cargo-dir"><?php echo _sb_h($_sb_cargo['direccion_nombre']); ?></div>
+        <div class="cargo-unit"><?php echo _sb_h($_sb_cargo['unidad_nombre']); ?></div>
+        <div class="cargo-dates">
+          <?php echo _sb_h($_sb_cargo['fecha_desde']); ?>
+          <?php echo $_sb_cargo['fecha_hasta'] ? ' → ' . _sb_h($_sb_cargo['fecha_hasta']) : ' → vigente'; ?>
+        </div>
+      <?php else: ?>
+        <div class="cargo-label">Cargo vigente</div>
+        <div class="cargo-unit" style="color:var(--text-subtle);font-style:italic;font-size:12px;">Sin cargo asignado para hoy.</div>
+      <?php endif; ?>
     </div>
-    <?php else: ?>
-    <div class="cargo-block">
-      <div class="cargo-label">Cargo vigente</div>
-      <div class="cargo-unit" style="color:var(--text-subtle);font-style:italic;font-size:12px;">Sin cargo asignado para hoy.</div>
-    </div>
-    <?php endif; ?>
+
+  </div><!-- /sidebar-header -->
+
+  <!-- ══ NAVEGACIÓN SCROLLABLE ════════════════════════════ -->
+  <div class="sidebar-scroll">
 
     <!-- ── Admin ─────────────────────────────────────────── -->
     <?php if ($_sb_is_admin): ?>
@@ -335,7 +339,8 @@ function _sb_h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
   </div><!-- /sidebar-scroll -->
 
-  <!-- ── Footer: cerrar sesión ─────────────────────────── -->
+  <!-- ══ FOOTER FIJO: CERRAR SESIÓN ════════════════════════ -->
+  <!-- Siempre visible al fondo del sidebar -->
   <div class="sidebar-footer">
     <a class="nav-item is-danger" href="<?php echo $_sb_base; ?>/logout.php">
       <svg class="nav-item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -350,22 +355,25 @@ function _sb_h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
 <script>
 (function () {
-  var hamburger = document.getElementById('hamburgerBtn');
-  var sidebar   = document.getElementById('sidebar');
-  var overlay   = document.getElementById('sidebarOverlay');
+  var hamburger  = document.getElementById('hamburgerBtn');
+  var closeBtn   = document.getElementById('sidebarCloseBtn');
+  var sidebar    = document.getElementById('sidebar');
+  var overlay    = document.getElementById('sidebarOverlay');
 
-  function openSidebar()  {
-    if (sidebar)  sidebar.classList.add('is-open');
-    if (overlay)  overlay.classList.remove('is-hidden');
+  function openSidebar() {
+    if (sidebar)   sidebar.classList.add('is-open');
+    if (overlay)   overlay.classList.remove('is-hidden');
     if (hamburger) hamburger.classList.add('is-open');
   }
+
   function closeSidebar() {
-    if (sidebar)  sidebar.classList.remove('is-open');
-    if (overlay)  overlay.classList.add('is-hidden');
+    if (sidebar)   sidebar.classList.remove('is-open');
+    if (overlay)   overlay.classList.add('is-hidden');
     if (hamburger) hamburger.classList.remove('is-open');
   }
 
   if (hamburger) hamburger.addEventListener('click', openSidebar);
+  if (closeBtn)  closeBtn.addEventListener('click', closeSidebar);
   if (overlay)   overlay.addEventListener('click', closeSidebar);
 
   document.addEventListener('keydown', function (e) {
