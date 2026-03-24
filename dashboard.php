@@ -23,29 +23,6 @@ try {
   $misActividades = $stmt->fetchAll();
 } catch (Exception $e) { $misActividades = array(); }
 
-/* Cargo vigente */
-$cargoVigente = null;
-try {
-  $stmt = $pdo->prepare("
-    SELECT fc.tipo, fc.fecha_desde, fc.fecha_hasta,
-           c.nombre AS cargo_nombre,
-           u.nombre AS unidad_nombre,
-           d.nombre AS direccion_nombre
-    FROM funcionario_cargos fc
-    JOIN cargos c       ON c.id = fc.cargo_id
-    JOIN unidades u     ON u.id = c.unidad_id
-    JOIN direcciones d  ON d.id = u.direccion_id
-    WHERE fc.funcionario_id = ?
-      AND fc.activo = 1
-      AND fc.fecha_desde <= CURDATE()
-      AND (fc.fecha_hasta IS NULL OR fc.fecha_hasta >= CURDATE())
-    ORDER BY (fc.tipo='titular') DESC, fc.fecha_desde DESC
-    LIMIT 1
-  ");
-  $stmt->execute(array($fid));
-  $cargoVigente = $stmt->fetch();
-} catch (Exception $e) { $cargoVigente = null; }
-
 /* ── Helpers ── */
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 

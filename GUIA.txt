@@ -1,0 +1,10 @@
+1. Añador margin 0 al body
+body{font-family:Arial,sans-serif;margin:0;color:#111; background-color: #f8f9fa;}
+
+2. Añadir php sidebar.php en body del html
+<?php require __DIR__ . '/../inc/sidebar.php'; ?>
+
+3. agregar un main con padding y overflow con los siguientes parametros al contenido del .php
+<main style="padding: 20px; width: 100%; box-sizing: border-box; overflow-y: auto;">
+
+4. añadir los .css a los php correspondientes theme.css es la base para los colores y estetica

@@ -1,10 +1,37 @@
 /* ════════════════════════════════════════════════════════════
    sidebar.css — Sidebar global · Intranet Municipal
-   Incluye topbar y sidebar. Requiere theme.css antes.
+   v2 — Layout corregido: desktop fijo / móvil body-scroll
+   Requiere theme.css antes.
+   ════════════════════════════════════════════════════════════
+
+   MODELO DE LAYOUT
+   ──────────────────────────────────────────────────────────
+   Desktop (> 800 px)
+     html/body          → height:100%; overflow:hidden
+     .app-shell         → flex column; height:100vh
+     .body-layout       → flex row; flex:1; overflow:hidden
+     .sidebar           → columna fija 260 px; flex column
+     .sidebar-scroll    → flex:1; overflow-y:auto   ← scroll nav
+     .main-content      → flex:1; overflow-y:auto   ← scroll página
+                          (definido en dashboard.css / users_form.css)
+
+   Móvil  (≤ 800 px)
+     html/body          → height:auto; overflow:auto  ← body scroll
+     .app-shell         → min-height:100dvh; sin overflow
+     .body-layout       → bloque normal
+     .sidebar           → position:fixed; drawer slide-in
+     .main-content      → flujo normal (sin overflow)
+
    ════════════════════════════════════════════════════════════ */
 
-/* ── App Shell ────────────────────────────────────────────── */
-html, body { height: 100%; overflow: hidden; }
+/* ══════════════════════════════════════════════════════════
+   1. APP SHELL — desktop: viewport fijo
+   ══════════════════════════════════════════════════════════ */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
 
 .app-shell {
   display: flex;
@@ -14,23 +41,23 @@ html, body { height: 100%; overflow: hidden; }
 }
 
 /* ══════════════════════════════════════════════════════════
-   TOPBAR
+   2. TOPBAR
    ══════════════════════════════════════════════════════════ */
 .topbar {
   height: 52px;
+  flex-shrink: 0;
   background: var(--topbar-bg);
   border-bottom: 1px solid var(--topbar-border);
   display: flex;
   align-items: center;
   padding: 0 20px;
   gap: 12px;
-  flex-shrink: 0;
   z-index: 200;
   -webkit-backdrop-filter: blur(10px);
           backdrop-filter: blur(10px);
 }
 
-/* Logo / brand */
+/* Brand */
 .topbar-logo {
   display: flex;
   align-items: center;
@@ -60,9 +87,8 @@ html, body { height: 100%; overflow: hidden; }
 }
 .topbar-logo-sub { font-weight: 400; color: var(--text-muted); }
 
-/* Separador y nombre organización */
-.topbar-sep { width: 1px; height: 20px; background: var(--border-1); flex-shrink: 0; }
-.topbar-org {
+.topbar-sep  { width: 1px; height: 20px; background: var(--border-1); flex-shrink: 0; }
+.topbar-org  {
   font-size: 13px;
   color: var(--text-subtle);
   flex: 1;
@@ -71,14 +97,14 @@ html, body { height: 100%; overflow: hidden; }
   text-overflow: ellipsis;
 }
 
-/* ── Info usuario en topbar (no se usa) ─────────────────── */
-.topbar-user-mob  { display: none; }
-.topbar-avatar    { display: none; }
+/* Ocultos por defecto (solo móvil los usa) */
+.topbar-user-mob,
+.topbar-avatar,
 .topbar-user-name { display: none; }
 
-/* ── Hamburger ────────────────────────────────────────────── */
+/* Hamburger */
 .topbar-hamburger {
-  display: none;
+  display: none;          /* visible solo en móvil */
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -100,55 +126,58 @@ html, body { height: 100%; overflow: hidden; }
   color: var(--text-primary);
 }
 
-/* ── Body layout ──────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   3. BODY LAYOUT
+   ══════════════════════════════════════════════════════════ */
 .body-layout {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  overflow: hidden;   /* contiene sidebar + main, ambos scrollan internamente */
+  min-height: 0;      /* necesario para que flex children respeten el límite */
   position: relative;
-  min-height: 0;
 }
 
 /* ══════════════════════════════════════════════════════════
-   SIDEBAR
+   4. SIDEBAR
    ══════════════════════════════════════════════════════════ */
 .sidebar {
   width: 260px;
   flex-shrink: 0;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--sidebar-border);
+
+  /* ── Tres zonas: header (fijo) + scroll (flex:1) + footer (fijo) */
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  min-height: 0;      /* permite que el flex-col respete la altura de .body-layout */
+  overflow: hidden;   /* el scroll lo maneja .sidebar-scroll, no el sidebar */
+
   z-index: 100;
   transition: transform var(--t-normal);
 }
 
-/* Overlay móvil */
+/* Overlay oscuro para cerrar el drawer en móvil */
 .sidebar-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.65);
+  background: rgba(0, 0, 0, .65);
   z-index: 99;
   -webkit-backdrop-filter: blur(2px);
           backdrop-filter: blur(2px);
 }
 
-/* ══════════════════════════════════════════════════════════
-   SIDEBAR HEADER — Siempre visible, fijo arriba
-   Contiene: botón cerrar + perfil + cargo
-   ══════════════════════════════════════════════════════════ */
+/* ── 4a. Header (siempre visible, no hace scroll) ────────── */
 .sidebar-header {
   flex-shrink: 0;
   border-bottom: 1px solid var(--border-1);
   background: var(--sidebar-bg);
-  position: relative; /* para posicionar el botón X */
+  position: relative;
 }
 
-/* ── Botón cerrar (X) — solo visible en móvil ────────────── */
+/* Botón cerrar (×) — solo en móvil */
 .sidebar-close-btn {
-  display: none; /* visible solo en móvil via media query */
+  display: none;
   position: absolute;
   top: 10px;
   right: 10px;
@@ -172,7 +201,7 @@ html, body { height: 100%; overflow: hidden; }
   color: var(--red);
 }
 
-/* ── Profile Block ────────────────────────────────────────── */
+/* Profile block */
 .profile-block {
   padding: 16px 14px 12px;
   background: linear-gradient(180deg, #12181f 0%, var(--sidebar-bg) 100%);
@@ -183,8 +212,7 @@ html, body { height: 100%; overflow: hidden; }
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
-  /* dejar espacio para el botón X en móvil */
-  padding-right: 38px;
+  padding-right: 38px; /* espacio para botón × en móvil */
 }
 
 .avatar {
@@ -193,8 +221,8 @@ html, body { height: 100%; overflow: hidden; }
   border-radius: 50%;
   flex-shrink: 0;
   background: linear-gradient(135deg, #1c3d6e 0%, #0f2448 100%);
-  border: 2px solid rgba(88,166,255,.3);
-  box-shadow: 0 0 0 1px rgba(88,166,255,.12), 0 2px 8px rgba(0,0,0,.5);
+  border: 2px solid rgba(88, 166, 255, .3);
+  box-shadow: 0 0 0 1px rgba(88, 166, 255, .12), 0 2px 8px rgba(0, 0, 0, .5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -226,10 +254,10 @@ html, body { height: 100%; overflow: hidden; }
 
 .profile-badges { display: flex; gap: 5px; flex-wrap: wrap; }
 
-/* ── Cargo Block ──────────────────────────────────────────── */
+/* Cargo block */
 .cargo-block {
   padding: 10px 14px 13px;
-  background: rgba(255,255,255,.015);
+  background: rgba(255, 255, 255, .015);
 }
 
 .cargo-label {
@@ -276,17 +304,24 @@ html, body { height: 100%; overflow: hidden; }
   margin-top: 4px;
 }
 
-/* ══════════════════════════════════════════════════════════
-   SIDEBAR SCROLL — Solo la navegación hace scroll
-   ══════════════════════════════════════════════════════════ */
+/* ── 4b. Scroll (navegación — hace scroll) ────────────────── */
 .sidebar-scroll {
-  flex: 1;
+  flex: 1;          /* ocupa todo el espacio entre header y footer */
+  min-height: 0;    /* necesario para que overflow-y funcione en flex */
   overflow-y: auto;
   overflow-x: hidden;
   padding-bottom: 4px;
-}
 
-/* ── Nav sections ─────────────────────────────────────────── */
+  /* Scrollbar delgada */
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-4) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar       { width: 4px; }
+.sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: var(--surface-4); border-radius: 4px; }
+.sidebar-scroll::-webkit-scrollbar-thumb:hover { background: var(--border-3); }
+
+/* ── Nav sections ──────────────────────────────────────────── */
 .nav-section { padding: 10px 0 2px; }
 
 .nav-section-label {
@@ -298,12 +333,11 @@ html, body { height: 100%; overflow: hidden; }
   color: var(--text-subtle);
 }
 
-/* Colores de etiqueta por sección */
 .nav-section.section-admin    > .nav-section-label { color: var(--amber); opacity: .9; }
 .nav-section.section-gestion  > .nav-section-label { color: var(--blue);  opacity: .85; }
 .nav-section.section-personal > .nav-section-label { color: var(--green); opacity: .85; }
 
-/* ── Nav items ────────────────────────────────────────────── */
+/* Nav items */
 .nav-item {
   display: flex;
   align-items: center;
@@ -319,21 +353,18 @@ html, body { height: 100%; overflow: hidden; }
   overflow: hidden;
   text-decoration: none;
 }
-
 .nav-item:hover {
   background: var(--sidebar-item-hover);
   color: var(--text-primary);
   border-left-color: var(--border-3);
   text-decoration: none;
 }
-
 .nav-item.is-active {
   background: var(--sidebar-item-active);
   color: var(--blue);
   border-left-color: var(--blue);
   font-weight: 600;
 }
-
 .nav-item.is-danger { color: var(--red); opacity: .9; }
 .nav-item.is-danger:hover {
   background: var(--red-subtle);
@@ -343,7 +374,7 @@ html, body { height: 100%; overflow: hidden; }
   text-decoration: none;
 }
 
-/* Iconos coloreados por sección */
+/* Iconos por sección */
 .nav-item-icon { flex-shrink: 0; transition: opacity var(--t-fast), color var(--t-fast); }
 
 .section-admin    .nav-item .nav-item-icon { color: var(--amber); opacity: .7; }
@@ -364,32 +395,75 @@ html, body { height: 100%; overflow: hidden; }
 /* Separador */
 .nav-sep { height: 1px; background: var(--border-2); margin: 4px 14px; }
 
-/* ══════════════════════════════════════════════════════════
-   SIDEBAR FOOTER — Siempre visible al fondo
-   ══════════════════════════════════════════════════════════ */
+/* ── 4c. Footer (siempre visible al fondo) ────────────────── */
 .sidebar-footer {
   flex-shrink: 0;
   border-top: 1px solid var(--border-1);
   padding: 6px 0;
   background: var(--sidebar-bg);
-  /* Sombra sutil para indicar que hay contenido arriba */
-  box-shadow: 0 -4px 12px rgba(0,0,0,.3);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, .3);
 }
 
-/* ══ Responsive ════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   5. MAIN CONTENT — base mínima
+   El resto lo define dashboard.css / users_form.css
+   ══════════════════════════════════════════════════════════ */
+.main-content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-4) transparent;
+}
+.main-content::-webkit-scrollbar       { width: 5px; }
+.main-content::-webkit-scrollbar-track { background: transparent; }
+.main-content::-webkit-scrollbar-thumb { background: var(--surface-4); border-radius: 4px; }
+.main-content::-webkit-scrollbar-thumb:hover { background: var(--border-3); }
+
+/* ══════════════════════════════════════════════════════════
+   6. RESPONSIVE — Móvil (≤ 800 px)
+      Modelo distinto: body scroll + sidebar como drawer fijo
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 800px) {
-  html, body  { overflow: auto; }
-  .app-shell  { height: 100dvh; }
-  .body-layout { overflow: auto; }
 
-  /* Mostrar hamburger */
+  /* ── Resetear el modelo "viewport fijo" ────────────────── */
+  html,
+  body {
+    height: auto;
+    overflow: auto;   /* el cuerpo vuelve a hacer scroll normalmente */
+  }
+
+  .app-shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible; /* sin overflow hidden */
+  }
+
+  .body-layout {
+    display: block;   /* deja de ser flex para fluir normalmente */
+    overflow: visible;
+    position: relative;
+  }
+
+  /* ── Main content: flujo normal en móvil ───────────────── */
+  .main-content {
+    overflow: visible; /* el body hace el scroll, no este div */
+    min-height: 0;
+    align-items: stretch;
+  }
+
+  /* ── Topbar: mostrar hamburger ─────────────────────────── */
   .topbar-hamburger { display: flex; }
-
-  /* En móvil mostramos: logo + "Intranet Municipal" + sep + org */
-  /* El sep y org se vuelven visibles; logo-name también */
   .topbar-logo-name { display: block; }
   .topbar-sep       { display: block; }
-  .topbar-org       {
+  .topbar-org {
     display: block;
     font-size: 12px;
     flex: 1;
@@ -398,33 +472,42 @@ html, body { height: 100%; overflow: hidden; }
     white-space: nowrap;
   }
 
-  /* Sidebar deslizable */
+  /* ── Sidebar: drawer fijo ──────────────────────────────── */
   .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     height: 100%;
-    z-index: 300;
-    transform: translateX(-100%);
-    box-shadow: var(--shadow-lg);
+    height: 100dvh;
     width: 280px;
+    z-index: 300;
+    transform: translateX(-100%);           /* oculto a la izquierda */
     transition: transform .22s cubic-bezier(.4, 0, .2, 1);
+    box-shadow: var(--shadow-lg);
   }
-  .sidebar.is-open { transform: translateX(0); }
+  .sidebar.is-open {
+    transform: translateX(0);              /* visible al abrir */
+  }
 
-  /* Mostrar overlay y botón X */
+  /* Sidebar-scroll recupera su altura completa en el drawer */
+  .sidebar-scroll {
+    overflow-y: auto;
+  }
+
+  /* Overlay */
   .sidebar-overlay           { display: block; }
   .sidebar-overlay.is-hidden { display: none; }
-  .sidebar-close-btn         { display: flex; }
 
-  /* Ajustar profile-row para que el botón X no tape el nombre */
+  /* Botón × dentro del sidebar */
+  .sidebar-close-btn { display: flex; }
+
+  /* Espacio para el botón × junto al nombre */
   .profile-row { padding-right: 42px; }
 }
 
 @media (max-width: 480px) {
   .topbar { padding: 0 12px; gap: 8px; }
-  /* En pantallas muy pequeñas ocultamos el texto org para no saturar */
   .topbar-org { display: none; }
   .topbar-sep { display: none; }
 }

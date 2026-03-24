@@ -1,29 +1,22 @@
 /* ════════════════════════════════════════════════════════════
    dashboard.css — Intranet Municipal
    Estilos del contenido principal del dashboard.
-   El layout base (app-shell, topbar, sidebar) está en sidebar.css.
+   Requiere sidebar.css (que ya define .main-content base).
    ════════════════════════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════════════════════
-   MAIN CONTENT
+   MAIN CONTENT — override para dashboard
+   sidebar.css ya define flex:1 / overflow-y:auto / etc.
+   Aquí solo centramos el wrapper interno.
    ══════════════════════════════════════════════════════════ */
-.main-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;        /* centra .page-wrapper en pantallas anchas */
-  background: var(--bg);
-  min-width: 0;
-}
 
+/* .page-wrapper es el contenedor interior del dashboard */
 .page-wrapper {
   padding: 28px 36px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 1280px;          /* permite crecer en monitores grandes */
+  max-width: 1280px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -146,14 +139,27 @@
 .prio-low    { color: var(--green); font-weight: 500; }
 .prio-other  { color: var(--text-subtle); }
 
-/* ══ Responsive ════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 1100px) {
   .page-wrapper { padding: 24px 28px; }
 }
 
 @media (max-width: 800px) {
-  .main-content { overflow: visible; align-items: stretch; }
-  .page-wrapper { padding: 16px; gap: 14px; }
+  /* En móvil .main-content ya no tiene overflow; el body scrollea.
+     .page-wrapper se estira a todo el ancho. */
+  .main-content {
+    overflow: visible;
+    align-items: stretch;
+  }
+
+  .page-wrapper {
+    padding: 16px;
+    gap: 14px;
+    max-width: 100%;
+  }
+
   .stats-grid   { grid-template-columns: repeat(2, 1fr); }
   .page-title   { font-size: 20px; }
   .page-actions .btn span { display: none; }
@@ -161,4 +167,5 @@
 
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
+  .page-wrapper { padding: 12px; }
 }
