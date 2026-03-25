@@ -1,0 +1,425 @@
+
+/* ── Page wrapper ─────────────────────────────────────── */
+.hh-page {
+    padding: 28px 36px 64px;
+    width: 100%;
+    max-width: 1100px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+}
+
+/* ── Heading ──────────────────────────────────────────── */
+.hh-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.hh-heading-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.hh-heading-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--r-md);
+    background: var(--blue-subtle);
+    border: 1px solid var(--blue-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--blue);
+}
+
+.hh-heading-text h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -.3px;
+    line-height: 1.2;
+    margin: 0 0 4px;
+}
+
+.hh-heading-text p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ── Alert ────────────────────────────────────────────── */
+.hh-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 16px;
+    border-radius: var(--r-md);
+    border: 1px solid;
+    font-size: 13px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+.hh-alert svg { flex-shrink: 0; margin-top: 1px; }
+.hh-alert-error   { background: var(--red-subtle);   border-color: var(--red-border);   color: var(--red); }
+.hh-alert-success { background: var(--green-subtle);  border-color: var(--green-border); color: var(--green); }
+
+/* ── Confirmation card ────────────────────────────────── */
+.hh-confirm {
+    background: var(--surface-1);
+    border: 1px solid var(--green-border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    margin-bottom: 28px;
+}
+
+.hh-confirm-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--green-subtle);
+    border-bottom: 1px solid var(--green-border);
+}
+
+.hh-confirm-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(46,160,67,.25);
+    border: 1px solid var(--green-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green);
+    flex-shrink: 0;
+}
+
+.hh-confirm-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--green);
+}
+
+.hh-confirm-sub {
+    font-size: 12px;
+    color: var(--green);
+    opacity: .8;
+}
+
+.hh-confirm-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.hh-confirm-field { display: flex; flex-direction: column; gap: 3px; }
+.hh-confirm-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--text-subtle); }
+.hh-confirm-value { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+.hh-confirm-code  { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--green); letter-spacing: 2px; }
+
+.hh-confirm-actions {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border-1);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ── Filter panel ─────────────────────────────────────── */
+.hh-filter {
+    background: var(--surface-1);
+    border: 1px solid var(--border-1);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.hh-filter-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border-1);
+    background: var(--surface-2);
+}
+
+.hh-filter-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--r);
+    background: var(--blue-subtle);
+    border: 1px solid var(--blue-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blue);
+    flex-shrink: 0;
+}
+
+.hh-filter-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+.hh-filter-body {
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 14px;
+    align-items: end;
+}
+
+.hh-filter-field { display: flex; flex-direction: column; gap: 5px; }
+.hh-filter-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+
+.hh-input,
+.hh-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border-3);
+    border-radius: var(--r-md);
+    padding: 8px 12px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+    -webkit-appearance: none;
+            appearance: none;
+}
+.hh-input:focus,
+.hh-select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-subtle);
+}
+.hh-input::placeholder { color: var(--text-subtle); }
+
+/* ── Service info strip ───────────────────────────────── */
+.hh-service-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.hh-service-info { display: flex; align-items: center; gap: 10px; }
+
+.hh-service-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-subtle);
+    flex-shrink: 0;
+}
+
+.hh-service-name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.hh-service-desc { font-size: 12px; color: var(--text-subtle); margin-top: 2px; }
+
+.hh-date-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-1);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.hh-date-badge svg { color: var(--blue); }
+
+/* ── Slots grid ───────────────────────────────────────── */
+.hh-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+}
+
+/* ── Slot card ────────────────────────────────────────── */
+.hh-slot {
+    background: var(--surface-1);
+    border: 1px solid var(--border-1);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    transition: border-color var(--t-fast), transform var(--t-fast);
+}
+.hh-slot:hover { border-color: var(--blue-border); transform: translateY(-1px); }
+
+.hh-slot-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border-1);
+    background: var(--surface-2);
+}
+
+.hh-slot-time {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: .5px;
+}
+
+.hh-slot-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.hh-slot-badge.available {
+    background: var(--green-subtle);
+    border: 1px solid var(--green-border);
+    color: var(--green);
+}
+
+.hh-slot-badge.available::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+}
+
+/* ── Slot form ────────────────────────────────────────── */
+.hh-slot-form {
+    padding: 16px;
+}
+
+.hh-slot-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.hh-slot-field { display: flex; flex-direction: column; gap: 4px; }
+.hh-slot-field.full { grid-column: 1 / -1; }
+.hh-slot-label { font-size: 11px; font-weight: 600; color: var(--text-subtle); text-transform: uppercase; letter-spacing: .5px; }
+
+.hh-slot-input {
+    background: var(--bg);
+    border: 1px solid var(--border-2);
+    border-radius: var(--r);
+    padding: 7px 10px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text-primary);
+    outline: none;
+    width: 100%;
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+    -webkit-appearance: none;
+    appearance: none;
+}
+.hh-slot-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-subtle);
+}
+.hh-slot-input::placeholder { color: var(--text-subtle); }
+
+/* ── Submit button ────────────────────────────────────── */
+.hh-slot-submit {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 18px;
+    background: var(--blue-dim);
+    border: 1px solid rgba(240,246,252,.12);
+    border-radius: var(--r-md);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: background var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast);
+    text-shadow: 0 1px 0 rgba(0,0,0,.15);
+    box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 2px 4px rgba(0,0,0,.4);
+}
+.hh-slot-submit:hover {
+    background: var(--blue);
+    box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 3px 8px rgba(0,0,0,.4);
+    transform: translateY(-1px);
+}
+.hh-slot-submit:active { transform: translateY(0); box-shadow: none; }
+
+.hh-slot-note {
+    font-size: 11px;
+    color: var(--text-subtle);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ── Empty state ──────────────────────────────────────── */
+.hh-empty {
+    background: var(--surface-1);
+    border: 1px solid var(--border-1);
+    border-radius: var(--r-lg);
+    padding: 56px 24px;
+    text-align: center;
+    color: var(--text-subtle);
+}
+
+.hh-empty svg { margin: 0 auto 14px; opacity: .25; }
+.hh-empty-title { font-size: 15px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+.hh-empty-sub { font-size: 13px; }
+
+/* ── No services ──────────────────────────────────────── */
+.hh-no-services {
+    background: var(--surface-1);
+    border: 1px solid var(--border-1);
+    border-radius: var(--r-lg);
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.hh-no-services svg { margin: 0 auto 12px; color: var(--text-subtle); opacity: .3; }
+.hh-no-services p   { font-size: 13px; color: var(--text-muted); }
+
+/* ── Section label ────────────────────────────────────── */
+.hh-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--text-subtle);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.hh-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border-1); }
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .hh-page { padding: 24px 28px 56px; }
+}
+
+@media (max-width: 800px) {
+    .main-content { overflow: visible; align-items: stretch; }
+    .hh-page { padding: 20px 16px 48px; max-width: 100%; }
+    .hh-heading-text h1 { font-size: 18px; }
+    .hh-filter-body { grid-template-columns: 1fr; }
+    .hh-confirm-body { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+    .hh-slots-grid { grid-template-columns: 1fr; }
+    .hh-slot-fields { grid-template-columns: 1fr; }
+}

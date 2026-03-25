@@ -1,5 +1,5 @@
 <?php
-// horarios_horas.php (Público) - Reserva en 1 paso - PHP 5.6
+// horarios_horas.php — Reserva pública de horas · PHP 5.6
 require __DIR__ . '/inc/db.php';
 require __DIR__ . '/inc/horas_helpers.php';
 
@@ -57,20 +57,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone  = phone_clean((string)(isset($_POST['phone']) ? $_POST['phone'] : ''));
     $email  = trim((string)(isset($_POST['email']) ? $_POST['email'] : ''));
 
-    // Mantener filtros en la URL (para recargar mostrando el mismo servicio/fecha)
     $serviceId = (int)(isset($_POST['service_id']) ? $_POST['service_id'] : $serviceId);
     $dateDay   = (string)(isset($_POST['date']) ? $_POST['date'] : $dateDay);
 
-    if ($slotId <= 0) $errMsg = 'Slot inválido.';
-    elseif ($name === '' || strlen($name) < 3) $errMsg = 'Ingresa tu nombre.';
-    elseif ($rut === '' || strlen($rut) < 7) $errMsg = 'Ingresa un RUT válido (sin puntos).';
-    elseif ($phone === '' || strlen($phone) < 8) $errMsg = 'Ingresa un teléfono válido.';
+    if ($slotId <= 0)                              $errMsg = 'Slot inválido.';
+    elseif ($name === '' || strlen($name) < 3)     $errMsg = 'Ingresa tu nombre completo.';
+    elseif ($rut === '' || strlen($rut) < 7)       $errMsg = 'Ingresa un RUT válido (sin puntos, ej: 12345678K).';
+    elseif ($phone === '' || strlen($phone) < 8)   $errMsg = 'Ingresa un número de teléfono válido.';
     elseif ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) $errMsg = 'Email inválido.';
     else {
       try {
         $pdo->beginTransaction();
 
-        // Bloquear slot para evitar doble reserva simultánea
         $st = $pdo->prepare("
           SELECT s.id, s.service_id, s.date_day, s.start_time, s.end_time,
                  s.capacity_total, s.capacity_used, s.status,
@@ -86,43 +84,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$slot) throw new Exception('El horario seleccionado no existe.');
         if ((int)$slot['service_id'] !== (int)$serviceId) throw new Exception('El horario no corresponde al servicio seleccionado.');
         if ($slot['date_day'] !== $dateDay) throw new Exception('El horario no corresponde a la fecha seleccionada.');
-        if ($slot['status'] !== 'open') throw new Exception('Este horario no está disponible (cerrado).');
+        if ($slot['status'] !== 'open') throw new Exception('Este horario ya no está disponible.');
 
         $left = (int)$slot['capacity_total'] - (int)$slot['capacity_used'];
-        if ($left <= 0) throw new Exception('Este horario ya no tiene cupos.');
+        if ($left <= 0) throw new Exception('Este horario ya no tiene cupos disponibles.');
 
-        // Crear código y guardar cita
         $code = horas_random_code(10);
 
-        // Ajusta columnas si tu tabla appointments difiere
         $ins = $pdo->prepare("
           INSERT INTO appointments
             (service_id, slot_id, code, requester_name, requester_rut, requester_phone, requester_email, status, created_at)
-          VALUES
-            (?,?,?,?,?,?,?, 'confirmed', NOW())
+          VALUES (?,?,?,?,?,?,?, 'confirmed', NOW())
         ");
         $ins->execute(array(
-          (int)$slot['service_id'],
-          (int)$slot['id'],
-          $code,
-          $name,
-          $rut,
-          $phone,
+          (int)$slot['service_id'], (int)$slot['id'], $code,
+          $name, $rut, $phone,
           ($email === '' ? null : $email)
         ));
 
-        $appointmentId = (int)$pdo->lastInsertId();
-
-        // Consumir cupo
         $up = $pdo->prepare("
-          UPDATE slots
-          SET capacity_used = capacity_used + 1
+          UPDATE slots SET capacity_used = capacity_used + 1
           WHERE id = ? AND status='open' AND (capacity_total - capacity_used) > 0
         ");
         $up->execute(array((int)$slot['id']));
-        if ($up->rowCount() <= 0) throw new Exception('No se pudo tomar el cupo (posible concurrencia). Reintenta.');
+        if ($up->rowCount() <= 0) throw new Exception('No se pudo reservar el cupo. Intenta de nuevo.');
 
-        // Si se llenó, cerrar slot
         $chk = $pdo->prepare("SELECT capacity_total, capacity_used FROM slots WHERE id=? FOR UPDATE");
         $chk->execute(array((int)$slot['id']));
         $cap = $chk->fetch(PDO::FETCH_ASSOC);
@@ -133,17 +119,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->commit();
 
         $confirm = array(
-          'code' => $code,
+          'code'    => $code,
           'service' => $slot['service_name'],
-          'date' => $slot['date_day'],
-          'time' => substr($slot['start_time'],0,5) . ' - ' . substr($slot['end_time'],0,5),
-          'name' => $name,
-          'rut' => $rut,
-          'phone' => $phone,
-          'email' => $email
+          'date'    => $slot['date_day'],
+          'time'    => substr($slot['start_time'],0,5) . ' – ' . substr($slot['end_time'],0,5),
+          'name'    => $name,
+          'rut'     => $rut,
+          'phone'   => $phone,
+          'email'   => $email
         );
-
-        $okMsg = 'Reserva creada correctamente.';
+        $okMsg = 'Reserva confirmada.';
       } catch(Exception $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
         $errMsg = $e->getMessage();
@@ -167,165 +152,302 @@ if ($serviceId > 0) {
   $st = $pdo->prepare("
     SELECT id, date_day, start_time, end_time, capacity_total, capacity_used, status
     FROM slots
-    WHERE service_id=?
-      AND date_day=?
-      AND status='open'
-      AND (capacity_total - capacity_used) > 0
+    WHERE service_id=? AND date_day=? AND status='open' AND (capacity_total - capacity_used) > 0
     ORDER BY start_time ASC
   ");
   $st->execute(array($serviceId, $dateDay));
   $slots = $st->fetchAll(PDO::FETCH_ASSOC);
 }
 
-$dayName = array('Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado');
+// Fecha legible
+$dayNames = array('Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado');
+$monthNames = array(1=>'enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre');
 $ts = strtotime($dateDay);
 $labelDate = $dateDay;
-if ($ts) $labelDate = $dayName[(int)date('w',$ts)].' '.date('d-m-Y',$ts);
+if ($ts) {
+  $labelDate = $dayNames[(int)date('w',$ts)] . ' ' . date('j',$ts) . ' de ' . $monthNames[(int)date('n',$ts)] . ' de ' . date('Y',$ts);
+}
 ?>
 <!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Horarios disponibles</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    body{font-family:Arial,sans-serif;margin:18px;color:#111;background:#fafafa;}
-    .wrap{max-width:980px;margin:0 auto;}
-    .card{border:1px solid #ddd;border-radius:10px;padding:14px;background:#fff;}
-    .muted{color:#666;}
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:10px;}
-    .field{min-width:240px;flex:1;}
-    label{font-size:12px;color:#333;display:block;margin-bottom:6px;}
-    input, select{width:100%;padding:9px;border:1px solid #ddd;border-radius:8px;}
-    button.btn, a.btn{display:inline-block;padding:10px 12px;border:1px solid #111;border-radius:8px;text-decoration:none;background:#fff;cursor:pointer;}
-    button.btn:hover, a.btn:hover{background:#111;color:#fff;}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(320px,1fr));gap:12px;margin-top:12px;}
-    .slot{border:1px solid #eee;border-radius:10px;padding:12px;background:#fff;}
-    .slotTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;}
-    .pill{display:inline-block;padding:3px 8px;border-radius:999px;border:1px solid #ddd;font-size:12px;}
-    .ok{color:#0a7a2f;}
-    .bad{color:#b00020;}
-    .mini{display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:8px;margin-top:10px;}
-    .mini .full{grid-column:1/-1;}
-    .hr{border:none;border-top:1px solid #eee;margin:14px 0;}
-    .confirm{background:#f6fff3;border:1px solid #bfe7b2;border-radius:10px;padding:12px;margin-top:12px;}
-  </style>
+  <title>Solicitar Hora | Intranet Municipal</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="static/css/theme.css">
+  <link rel="stylesheet" href="static/css/sidebar.css">
+  <link rel="stylesheet" href="static/css/horarios_horas.css">
+  <link rel="icon" type="image/x-icon" href="static/img/logo.png">
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <h2 style="margin:0 0 6px 0;">Horarios disponibles</h2>
-    <div class="muted">Selecciona un servicio y fecha. Reserva en un paso.</div>
 
-    <?php if($okMsg): ?><p class="ok"><b><?php echo horas_h($okMsg); ?></b></p><?php endif; ?>
-    <?php if($errMsg): ?><p class="bad"><b><?php echo horas_h($errMsg); ?></b></p><?php endif; ?>
+<div class="app-shell">
 
-    <?php if($confirm): ?>
-      <div class="confirm">
-        <div><b>✅ Reserva confirmada</b></div>
-        <div>Código: <b><?php echo horas_h($confirm['code']); ?></b></div>
-        <div>Servicio: <?php echo horas_h($confirm['service']); ?></div>
-        <div>Fecha/Hora: <?php echo horas_h($confirm['date']); ?> · <?php echo horas_h($confirm['time']); ?></div>
-        <div>Nombre: <?php echo horas_h($confirm['name']); ?> · RUT: <?php echo horas_h($confirm['rut']); ?></div>
-        <div>Teléfono: <?php echo horas_h($confirm['phone']); ?><?php echo ($confirm['email']!=='' ? ' · Email: '.horas_h($confirm['email']) : ''); ?></div>
-      </div>
-    <?php endif; ?>
+  <?php require __DIR__ . '/inc/sidebar.php'; ?>
 
-    <form method="get" class="toolbar">
-      <div class="field">
-        <label>Servicio</label>
-        <select name="service_id" required>
-          <?php foreach($services as $s): ?>
-            <option value="<?php echo (int)$s['id']; ?>" <?php echo ((int)$s['id']===$serviceId?'selected':''); ?>>
-              <?php echo horas_h($s['name']); ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+  <main class="main-content">
+    <div class="hh-page">
 
-      <div class="field" style="min-width:220px;max-width:260px;">
-        <label>Fecha</label>
-        <input type="date" name="date" value="<?php echo horas_h($dateDay); ?>" required>
-      </div>
-
-      <div style="min-width:140px;">
-        <button class="btn" type="submit">Ver horarios</button>
-      </div>
-    </form>
-
-    <hr class="hr">
-
-    <?php if(!$service): ?>
-      <p class="muted">No hay servicios disponibles.</p>
-    <?php else: ?>
-      <h3 style="margin:0 0 6px 0;"><?php echo horas_h($service['name']); ?></h3>
-      <?php if(!empty($service['description'])): ?>
-        <div class="muted" style="margin-bottom:10px;"><?php echo nl2br(horas_h($service['description'])); ?></div>
-      <?php endif; ?>
-
-      <div class="muted"><b><?php echo horas_h($labelDate); ?></b></div>
-
-      <?php if(empty($slots)): ?>
-        <p class="muted" style="margin-top:10px;">
-          No hay cupos disponibles para esta fecha.
-          <br>Tip: si recién configuraste reglas, recuerda usar “Generar slots” en Admin.
-        </p>
-      <?php else: ?>
-        <div class="grid">
-          <?php foreach($slots as $sl): ?>
-            <?php
-              $cupos = (int)$sl['capacity_total'] - (int)$sl['capacity_used'];
-              $ini = substr($sl['start_time'],0,5);
-              $fin = substr($sl['end_time'],0,5);
-            ?>
-            <div class="slot">
-              <div class="slotTop">
-                <div>
-                  <div style="font-size:18px;"><b><?php echo horas_h($ini.' - '.$fin); ?></b></div>
-                  <div class="muted">Disponible: <span class="pill ok"><?php echo (int)$cupos; ?> cupo(s)</span></div>
-                </div>
-              </div>
-
-              <form method="post" style="margin-top:10px;">
-                <input type="hidden" name="horas_csrf" value="<?php echo horas_h(horas_csrf_token()); ?>">
-                <input type="hidden" name="slot_id" value="<?php echo (int)$sl['id']; ?>">
-                <input type="hidden" name="service_id" value="<?php echo (int)$serviceId; ?>">
-                <input type="hidden" name="date" value="<?php echo horas_h($dateDay); ?>">
-
-                <div class="mini">
-                  <div class="full">
-                    <label>Nombre y Apellido</label>
-                    <input name="name" required placeholder="Ej: Juan Pérez">
-                  </div>
-                  <div>
-                    <label>RUT</label>
-                    <input name="rut" required placeholder="12345678K">
-                  </div>
-                  <div>
-                    <label>Teléfono</label>
-                    <input name="phone" required placeholder="+56912345678">
-                  </div>
-                  <div class="full">
-                    <label>Email (opcional)</label>
-                    <input name="email" placeholder="correo@ejemplo.cl">
-                  </div>
-
-                  <div class="full">
-                    <button class="btn" type="submit">Reservar</button>
-                  </div>
-                </div>
-              </form>
-
-              <div class="muted" style="margin-top:8px;font-size:12px;">
-                Al reservar se genera un código de confirmación.
-              </div>
-            </div>
-          <?php endforeach; ?>
+      <!-- ── Heading ────────────────────────────────────── -->
+      <div class="hh-heading">
+        <div class="hh-heading-left">
+          <div class="hh-heading-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+              <line x1="8" y1="14" x2="8" y2="14" stroke-width="3"/>
+              <line x1="12" y1="14" x2="12" y2="14" stroke-width="3"/>
+              <line x1="16" y1="14" x2="16" y2="14" stroke-width="3"/>
+            </svg>
+          </div>
+          <div class="hh-heading-text">
+            <h1>Solicitar hora</h1>
+            <p>Selecciona el servicio, la fecha y el horario que prefieras.</p>
+          </div>
         </div>
-      <?php endif; ?>
-    <?php endif; ?>
+      </div>
 
-  </div>
-</div>
+      <!-- ── Alertas globales ────────────────────────────── -->
+      <?php if ($errMsg): ?>
+      <div class="hh-alert hh-alert-error">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm-.75 3.25h1.5v4h-1.5v-4zm0 5h1.5v1.5h-1.5v-1.5z"/>
+        </svg>
+        <?php echo horas_h($errMsg); ?>
+      </div>
+      <?php endif; ?>
+
+      <!-- ── Confirmación ────────────────────────────────── -->
+      <?php if ($confirm): ?>
+      <div class="hh-confirm">
+        <div class="hh-confirm-header">
+          <div class="hh-confirm-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="hh-confirm-title">Reserva confirmada</div>
+            <div class="hh-confirm-sub">Guarda tu código para consultar el estado de tu solicitud</div>
+          </div>
+        </div>
+        <div class="hh-confirm-body">
+          <div class="hh-confirm-field" style="grid-column:1/-1;">
+            <div class="hh-confirm-label">Código de reserva</div>
+            <div class="hh-confirm-code"><?php echo horas_h($confirm['code']); ?></div>
+          </div>
+          <div class="hh-confirm-field">
+            <div class="hh-confirm-label">Servicio</div>
+            <div class="hh-confirm-value"><?php echo horas_h($confirm['service']); ?></div>
+          </div>
+          <div class="hh-confirm-field">
+            <div class="hh-confirm-label">Fecha y hora</div>
+            <div class="hh-confirm-value"><?php echo horas_h($confirm['date']); ?> · <?php echo horas_h($confirm['time']); ?></div>
+          </div>
+          <div class="hh-confirm-field">
+            <div class="hh-confirm-label">Nombre</div>
+            <div class="hh-confirm-value"><?php echo horas_h($confirm['name']); ?></div>
+          </div>
+          <div class="hh-confirm-field">
+            <div class="hh-confirm-label">RUT</div>
+            <div class="hh-confirm-value" style="font-family:var(--font-mono);"><?php echo horas_h($confirm['rut']); ?></div>
+          </div>
+          <?php if ($confirm['phone']): ?>
+          <div class="hh-confirm-field">
+            <div class="hh-confirm-label">Teléfono</div>
+            <div class="hh-confirm-value"><?php echo horas_h($confirm['phone']); ?></div>
+          </div>
+          <?php endif; ?>
+          <?php if ($confirm['email']): ?>
+          <div class="hh-confirm-field">
+            <div class="hh-confirm-label">Email</div>
+            <div class="hh-confirm-value"><?php echo horas_h($confirm['email']); ?></div>
+          </div>
+          <?php endif; ?>
+        </div>
+        <div class="hh-confirm-actions">
+          <a class="btn btn-secondary btn-sm" href="estado_horas.php?code=<?php echo horas_h($confirm['code']); ?>">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Consultar estado
+          </a>
+          <a class="btn btn-secondary btn-sm" href="horarios_horas.php">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Nueva reserva
+          </a>
+        </div>
+      </div>
+      <?php endif; ?>
+
+      <!-- ── Panel de filtros ─────────────────────────────── -->
+      <div class="hh-filter">
+        <div class="hh-filter-header">
+          <div class="hh-filter-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <span class="hh-filter-title">Buscar disponibilidad</span>
+        </div>
+        <form method="get" class="hh-filter-body">
+          <div class="hh-filter-field">
+            <label class="hh-filter-label" for="f-service">Servicio</label>
+            <select class="hh-select" id="f-service" name="service_id">
+              <?php foreach ($services as $s): ?>
+                <option value="<?php echo (int)$s['id']; ?>" <?php echo ((int)$s['id'] === $serviceId ? 'selected' : ''); ?>>
+                  <?php echo horas_h($s['name']); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="hh-filter-field">
+            <label class="hh-filter-label" for="f-date">Fecha</label>
+            <input class="hh-input" type="date" id="f-date" name="date"
+                   value="<?php echo horas_h($dateDay); ?>"
+                   min="<?php echo date('Y-m-d'); ?>" required>
+          </div>
+          <div>
+            <button class="btn btn-primary" type="submit">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              Ver horarios
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ── Contenido principal ──────────────────────────── -->
+      <?php if (!$service): ?>
+        <div class="hh-no-services">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <p>No hay servicios disponibles en este momento.</p>
+        </div>
+      <?php else: ?>
+
+        <!-- Info del servicio + fecha seleccionada -->
+        <div class="hh-service-strip">
+          <div class="hh-service-info">
+            <div class="hh-service-dot"></div>
+            <div>
+              <div class="hh-service-name"><?php echo horas_h($service['name']); ?></div>
+              <?php if (!empty($service['description'])): ?>
+                <div class="hh-service-desc"><?php echo horas_h($service['description']); ?></div>
+              <?php endif; ?>
+            </div>
+          </div>
+          <div class="hh-date-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <?php echo horas_h($labelDate); ?>
+          </div>
+        </div>
+
+        <!-- Horarios disponibles -->
+        <?php if (empty($slots)): ?>
+          <div class="hh-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <div class="hh-empty-title">Sin disponibilidad para esta fecha</div>
+            <div class="hh-empty-sub">No hay cupos para el <?php echo horas_h($labelDate); ?>. Prueba con otra fecha.</div>
+          </div>
+        <?php else: ?>
+
+          <div class="hh-section-label">
+            <?php echo count($slots); ?> horario<?php echo count($slots) !== 1 ? 's' : ''; ?> disponible<?php echo count($slots) !== 1 ? 's' : ''; ?>
+          </div>
+
+          <div class="hh-slots-grid">
+            <?php foreach ($slots as $sl): ?>
+              <?php
+                $cupos = (int)$sl['capacity_total'] - (int)$sl['capacity_used'];
+                $ini   = substr($sl['start_time'], 0, 5);
+                $fin   = substr($sl['end_time'],   0, 5);
+              ?>
+              <div class="hh-slot">
+                <div class="hh-slot-head">
+                  <div class="hh-slot-time"><?php echo horas_h($ini . ' – ' . $fin); ?></div>
+                  <div class="hh-slot-badge available">
+                    <?php echo $cupos; ?> cupo<?php echo $cupos !== 1 ? 's' : ''; ?>
+                  </div>
+                </div>
+
+                <div class="hh-slot-form">
+                  <form method="post">
+                    <input type="hidden" name="horas_csrf"  value="<?php echo horas_h(horas_csrf_token()); ?>">
+                    <input type="hidden" name="slot_id"     value="<?php echo (int)$sl['id']; ?>">
+                    <input type="hidden" name="service_id"  value="<?php echo (int)$serviceId; ?>">
+                    <input type="hidden" name="date"        value="<?php echo horas_h($dateDay); ?>">
+
+                    <div class="hh-slot-fields">
+                      <div class="hh-slot-field full">
+                        <label class="hh-slot-label" for="name_<?php echo (int)$sl['id']; ?>">Nombre completo *</label>
+                        <input class="hh-slot-input" id="name_<?php echo (int)$sl['id']; ?>"
+                               name="name" placeholder="Ej: Juan Pérez González" required>
+                      </div>
+                      <div class="hh-slot-field">
+                        <label class="hh-slot-label" for="rut_<?php echo (int)$sl['id']; ?>">RUT *</label>
+                        <input class="hh-slot-input" id="rut_<?php echo (int)$sl['id']; ?>"
+                               name="rut" placeholder="12345678K" required>
+                      </div>
+                      <div class="hh-slot-field">
+                        <label class="hh-slot-label" for="phone_<?php echo (int)$sl['id']; ?>">Teléfono *</label>
+                        <input class="hh-slot-input" id="phone_<?php echo (int)$sl['id']; ?>"
+                               name="phone" placeholder="+56912345678" required>
+                      </div>
+                      <div class="hh-slot-field full">
+                        <label class="hh-slot-label" for="email_<?php echo (int)$sl['id']; ?>">Email <span style="font-weight:400;text-transform:none;letter-spacing:0;">(opcional)</span></label>
+                        <input class="hh-slot-input" type="email" id="email_<?php echo (int)$sl['id']; ?>"
+                               name="email" placeholder="correo@ejemplo.cl">
+                      </div>
+                    </div>
+
+                    <button class="hh-slot-submit" type="submit">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      Reservar este horario
+                    </button>
+                  </form>
+                  <div class="hh-slot-note">
+                    <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 1.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm-.75 3.25h1.5v4h-1.5v-4zm0 5h1.5v1.5h-1.5v-1.5z"/>
+                    </svg>
+                    Al confirmar recibirás un código único para seguimiento.
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+
+        <?php endif; ?>
+      <?php endif; ?>
+
+    </div><!-- /.hh-page -->
+  </main>
+
+  </div><!-- /body-layout -->
+</div><!-- /app-shell -->
+
 </body>
 </html>
