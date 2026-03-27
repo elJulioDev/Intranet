@@ -4,19 +4,13 @@
    Requiere sidebar.css (que ya define .main-content base).
    ════════════════════════════════════════════════════════════ */
 
-/* ══════════════════════════════════════════════════════════
-   MAIN CONTENT — override para dashboard
-   sidebar.css ya define flex:1 / overflow-y:auto / etc.
-   Aquí solo centramos el wrapper interno.
-   ══════════════════════════════════════════════════════════ */
-
-/* .page-wrapper es el contenedor interior del dashboard */
+/* ── Page wrapper ─────────────────────────────────────────── */
 .page-wrapper {
   padding: 28px 36px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 1280px;
+  /* Sin max-width: el contenido ocupa todo el espacio del main-content */
   width: 100%;
   box-sizing: border-box;
 }
@@ -31,7 +25,7 @@
 }
 
 .page-title {
-  font-size: 24px;
+  font-size: clamp(20px, 2vw, 28px);
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
@@ -67,7 +61,7 @@
   background: var(--surface-1);
   border: 1px solid var(--border-1);
   border-radius: var(--r-lg);
-  padding: 18px 20px;
+  padding: 20px 24px;
   border-left: 3px solid var(--border-1);
   transition: border-color var(--t-fast), transform var(--t-fast);
 }
@@ -84,7 +78,7 @@
   text-transform: uppercase;
   letter-spacing: .8px;
   color: var(--text-subtle);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .stat-card.accent-green .stat-label { color: var(--green); opacity: .8; }
 .stat-card.accent-amber .stat-label { color: var(--amber); opacity: .8; }
@@ -92,10 +86,10 @@
 
 .stat-value {
   font-family: var(--font-mono);
-  font-size: 32px;
+  font-size: clamp(28px, 3vw, 42px);
   font-weight: 700;
   line-height: 1;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 .stat-card.accent-default .stat-value { color: var(--text-primary); }
 .stat-card.accent-green   .stat-value { color: var(--green); }
@@ -140,15 +134,54 @@
 .prio-other  { color: var(--text-subtle); }
 
 /* ══════════════════════════════════════════════════════════
-   RESPONSIVE
+   PANTALLAS GRANDES (≥ 1440 px)
+   ══════════════════════════════════════════════════════════ */
+@media (min-width: 1440px) {
+  .page-wrapper {
+    padding: 36px 48px;
+    gap: 24px;
+  }
+
+  .stat-card {
+    padding: 24px 28px;
+  }
+
+  .stat-label { font-size: 12px; }
+  .stat-sub   { font-size: 13px; }
+
+  .panel-header { padding: 16px 22px; }
+  .panel-title  { font-size: 15px; }
+}
+
+@media (min-width: 1920px) {
+  .page-wrapper {
+    padding: 44px 64px;
+    gap: 28px;
+  }
+
+  .stats-grid { gap: 18px; }
+
+  .stat-card {
+    padding: 28px 32px;
+    border-radius: var(--r-xl);
+  }
+
+  .stat-label { font-size: 12px; letter-spacing: 1px; margin-bottom: 14px; }
+  .stat-sub   { font-size: 14px; }
+
+  .page-subtitle  { font-size: 14px; }
+  .panel-header   { padding: 18px 24px; }
+  .panel-title    { font-size: 16px; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — menor a 1440
    ══════════════════════════════════════════════════════════ */
 @media (max-width: 1100px) {
   .page-wrapper { padding: 24px 28px; }
 }
 
 @media (max-width: 800px) {
-  /* En móvil .main-content ya no tiene overflow; el body scrollea.
-     .page-wrapper se estira a todo el ancho. */
   .main-content {
     overflow: visible;
     align-items: stretch;

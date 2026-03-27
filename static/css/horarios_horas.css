@@ -3,7 +3,6 @@
 .hh-page {
     padding: 28px 36px 64px;
     width: 100%;
-    max-width: 1100px;
     box-sizing: border-box;
     font-family: var(--font-sans);
 }
@@ -405,6 +404,92 @@
     gap: 8px;
 }
 .hh-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border-1); }
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLAS GRANDES (≥ 1440 px)
+   ══════════════════════════════════════════════════════════ */
+@media (min-width: 1440px) {
+    .hh-page { 
+        padding: 36px 56px 80px; 
+    }
+
+    .hh-heading { margin-bottom: 36px; }
+    .hh-heading-icon { width: 56px; height: 56px; }
+    .hh-heading-text h1 { font-size: 28px; }
+
+    /* Tarjeta de Confirmación */
+    .hh-confirm-header { padding: 18px 24px; }
+    .hh-confirm-icon { width: 42px; height: 42px; }
+    .hh-confirm-title { font-size: 18px; }
+    .hh-confirm-body { padding: 24px; gap: 18px; }
+    .hh-confirm-code { font-size: 26px; }
+
+    /* Filtros */
+    .hh-filter-header { padding: 15px 22px; }
+    .hh-filter-title { font-size: 14px; }
+    .hh-filter-body { padding: 20px 22px; gap: 18px; }
+    .hh-input, .hh-select { padding: 10px 14px; font-size: 14px; }
+    .hh-filter-label { font-size: 13px; }
+
+    /* Grilla de Horas */
+    .hh-slots-grid { 
+        gap: 18px; 
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); 
+    }
+    .hh-slot-head { padding: 16px 20px 14px; }
+    .hh-slot-time { font-size: 22px; }
+    
+    /* Formulario dentro del Slot */
+    .hh-slot-form { padding: 20px; }
+    .hh-slot-fields { gap: 14px; }
+    .hh-slot-label { font-size: 12px; }
+    .hh-slot-input { padding: 9px 12px; font-size: 14px; }
+    .hh-slot-submit { padding: 10px 20px; font-size: 14px; }
+}
+
+@media (min-width: 1920px) {
+    .hh-page { 
+        padding: 48px 80px 96px; 
+    }
+
+    .hh-heading-icon { width: 64px; height: 64px; }
+    .hh-heading-text h1 { font-size: 32px; }
+    .hh-heading-text p { font-size: 15px; }
+
+    /* Tarjeta de Confirmación */
+    .hh-confirm-header { padding: 22px 28px; }
+    .hh-confirm-icon { width: 48px; height: 48px; }
+    .hh-confirm-title { font-size: 20px; }
+    .hh-confirm-sub { font-size: 14px; }
+    .hh-confirm-body { padding: 28px; gap: 24px; }
+    .hh-confirm-label { font-size: 13px; }
+    .hh-confirm-value { font-size: 16px; }
+    .hh-confirm-code { font-size: 30px; }
+
+    /* Filtros */
+    .hh-filter-header { padding: 18px 26px; }
+    .hh-filter-title { font-size: 15px; }
+    .hh-filter-body { padding: 24px 26px; gap: 24px; }
+    .hh-input, .hh-select { padding: 12px 16px; font-size: 15px; border-radius: var(--r-lg); }
+    .hh-filter-label { font-size: 14px; }
+
+    /* Grilla de Horas */
+    .hh-slots-grid { 
+        gap: 24px; 
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); 
+    }
+    .hh-slot-head { padding: 18px 24px 16px; }
+    .hh-slot-time { font-size: 26px; }
+    .hh-slot-badge { font-size: 12px; padding: 5px 12px; }
+    
+    /* Formulario dentro del Slot */
+    .hh-slot-form { padding: 24px; }
+    .hh-slot-fields { gap: 18px; }
+    .hh-slot-label { font-size: 13px; }
+    .hh-slot-input { padding: 11px 14px; font-size: 15px; border-radius: var(--r-md); }
+    .hh-slot-submit { padding: 12px 24px; font-size: 15px; border-radius: var(--r-lg); }
+    .hh-slot-note { font-size: 12px; margin-top: 12px; }
+}
 
 /* ── Responsive ───────────────────────────────────────── */
 @media (max-width: 1100px) {

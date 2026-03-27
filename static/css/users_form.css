@@ -1,18 +1,18 @@
 /* ════════════════════════════════════════════════════════════
    users_form.css — Admin · Crear / Editar Funcionario
-   Requiere sidebar.css (que define .main-content base) y theme.css.
+   Requiere sidebar.css y theme.css.
    ════════════════════════════════════════════════════════════ */
 
 /* ── .uf-page: wrapper de todo el contenido de la página ──── */
 .uf-page {
   padding: 28px 36px 64px;
   width: 100%;
-  max-width: 1280px;
+  /* Sin max-width fijo: se adapta al espacio disponible */
   box-sizing: border-box;
   font-family: var(--font-sans);
 }
 
-/* ── Page heading ───────────────────────────────────────────── */
+/* ── Page heading ─────────────────────────────────────────── */
 .uf-heading {
   display: flex;
   align-items: flex-start;
@@ -42,7 +42,7 @@
 }
 
 .uf-heading-text h1 {
-  font-size: 24px;
+  font-size: clamp(20px, 2vw, 28px);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -.3px;
@@ -56,7 +56,7 @@
   margin: 0;
 }
 
-/* ── Alerts ─────────────────────────────────────────────────── */
+/* ── Alerts ───────────────────────────────────────────────── */
 .uf-alert {
   display: flex;
   align-items: flex-start;
@@ -72,10 +72,10 @@
 .uf-alert-error   { background: var(--red-subtle);   border-color: var(--red-border);   color: var(--red); }
 .uf-alert-success { background: var(--green-subtle);  border-color: var(--green-border); color: var(--green); }
 
-/* ── Form layout ────────────────────────────────────────────── */
+/* ── Form layout ──────────────────────────────────────────── */
 .uf-form { display: flex; flex-direction: column; gap: 16px; }
 
-/* ── Section card ───────────────────────────────────────────── */
+/* ── Section card ─────────────────────────────────────────── */
 .uf-section {
   background: var(--surface-1);
   border: 1px solid var(--border-1);
@@ -85,7 +85,7 @@
 }
 .uf-section:focus-within { border-color: var(--border-3); }
 
-/* ── Section header ─────────────────────────────────────────── */
+/* ── Section header ───────────────────────────────────────── */
 .uf-section-header {
   display: flex;
   align-items: center;
@@ -112,7 +112,7 @@
 .uf-section-title    { font-size: 13px; font-weight: 600; color: var(--text-primary); flex: 1; }
 .uf-section-subtitle { font-size: 11px; color: var(--text-subtle); }
 
-/* ── Section body ───────────────────────────────────────────── */
+/* ── Section body ─────────────────────────────────────────── */
 .uf-section-body {
   padding: 18px;
   display: flex;
@@ -120,13 +120,13 @@
   gap: 0;
 }
 
-/* ── Grid dentro de sección ─────────────────────────────────── */
+/* ── Grid ─────────────────────────────────────────────────── */
 .uf-grid { display: grid; gap: 16px; }
 .uf-grid-2 { grid-template-columns: 1fr 1fr; }
 .uf-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
 .uf-col-full { grid-column: 1 / -1; }
 
-/* ── Field ──────────────────────────────────────────────────── */
+/* ── Field ────────────────────────────────────────────────── */
 .uf-field { display: flex; flex-direction: column; gap: 5px; }
 
 .uf-label {
@@ -140,7 +140,7 @@
 .uf-required { color: var(--red); font-weight: 700; }
 .uf-hint     { font-size: 11px; color: var(--text-subtle); margin-top: 2px; line-height: 1.4; }
 
-/* ── Inputs & Selects ───────────────────────────────────────── */
+/* ── Inputs & Selects ─────────────────────────────────────── */
 .uf-input,
 .uf-select {
   width: 100%;
@@ -163,7 +163,6 @@
 }
 .uf-input::placeholder { color: var(--text-subtle); }
 
-/* Select: custom arrow */
 .uf-select-wrap { position: relative; }
 .uf-select-wrap .uf-select { padding-right: 32px; cursor: pointer; }
 .uf-select-wrap::after {
@@ -179,7 +178,6 @@
   border-top: 5px solid var(--text-subtle);
 }
 
-/* Password */
 .uf-input-pw-wrap { position: relative; }
 .uf-input-pw-wrap .uf-input { padding-right: 40px; }
 .uf-input-pw-toggle {
@@ -198,7 +196,7 @@
 }
 .uf-input-pw-toggle:hover { color: var(--blue); }
 
-/* ── Toggle switch ──────────────────────────────────────────── */
+/* ── Toggle switch ────────────────────────────────────────── */
 .uf-toggle-row {
   display: flex;
   align-items: center;
@@ -253,7 +251,7 @@
 }
 .uf-toggle.is-amber input:checked + .uf-toggle-track::before { background: var(--amber); }
 
-/* ── Roles checkboxes ───────────────────────────────────────── */
+/* ── Roles checkboxes ─────────────────────────────────────── */
 .uf-roles-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -307,7 +305,7 @@
   border: 1px solid var(--border-1);
 }
 
-/* ── Cargo picker ───────────────────────────────────────────── */
+/* ── Cargo picker ─────────────────────────────────────────── */
 .uf-cargo-select-wrap .uf-select { background: var(--bg); font-family: var(--font-mono); font-size: 12px; }
 
 .uf-tipo-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -336,7 +334,7 @@
   color: var(--blue);
 }
 
-/* ── Footer actions ─────────────────────────────────────────── */
+/* ── Footer actions ───────────────────────────────────────── */
 .uf-footer {
   display: flex;
   align-items: center;
@@ -405,7 +403,7 @@
   text-decoration: none;
 }
 
-/* ── Utilitarios ────────────────────────────────────────────── */
+/* ── Utilitarios ──────────────────────────────────────────── */
 .uf-divider {
   display: flex;
   align-items: center;
@@ -444,7 +442,7 @@
   margin-top: 6px;
 }
 
-/* ── Topbar legacy (páginas sin sidebar.css) ───────────────── */
+/* ── Topbar legacy ────────────────────────────────────────── */
 .uf-topbar {
   height: 52px;
   background: var(--topbar-bg);
@@ -491,19 +489,78 @@
   border-radius: 999px;
 }
 
-/* ══ Responsive ─────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   PANTALLAS GRANDES (≥ 1440 px)
+   ══════════════════════════════════════════════════════════ */
+@media (min-width: 1440px) {
+  .uf-page {
+    padding: 36px 56px 80px;
+  }
+
+  .uf-heading { margin-bottom: 36px; }
+  .uf-heading-icon { width: 56px; height: 56px; }
+
+  .uf-section-header { padding: 15px 22px; }
+  .uf-section-title  { font-size: 14px; }
+  .uf-section-body   { padding: 22px; }
+
+  .uf-grid { gap: 20px; }
+
+  .uf-input,
+  .uf-select { padding: 10px 14px; font-size: 14px; }
+
+  .uf-label { font-size: 13px; }
+  .uf-hint  { font-size: 12px; }
+
+  .uf-footer { padding: 22px 24px; }
+  .uf-form   { gap: 20px; }
+}
+
+@media (min-width: 1920px) {
+  .uf-page {
+    padding: 48px 80px 96px;
+  }
+
+  .uf-heading-icon { width: 64px; height: 64px; }
+  .uf-heading-text h1 { font-size: 32px; }
+  .uf-heading-text p  { font-size: 15px; }
+
+  .uf-section-header { padding: 18px 26px; }
+  .uf-section-title  { font-size: 15px; }
+  .uf-section-subtitle { font-size: 13px; }
+  .uf-section-body   { padding: 26px; }
+
+  .uf-grid { gap: 24px; }
+
+  .uf-input,
+  .uf-select { padding: 12px 16px; font-size: 15px; border-radius: var(--r-lg); }
+
+  .uf-label { font-size: 14px; }
+  .uf-hint  { font-size: 13px; }
+
+  .uf-toggle-name { font-size: 14px; }
+  .uf-toggle-desc { font-size: 12px; }
+
+  .uf-footer    { padding: 26px 28px; }
+  .uf-form      { gap: 24px; }
+  .uf-alert     { padding: 16px 20px; font-size: 14px; }
+
+  .uf-btn-submit,
+  .uf-btn-cancel { padding: 11px 26px; font-size: 15px; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Responsive pequeño
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 1100px) {
   .uf-page { padding: 24px 28px 56px; }
 }
 
 @media (max-width: 800px) {
-  /* En móvil .main-content ya no hace scroll (lo hace el body).
-     .uf-page se estira al ancho completo. */
   .main-content {
     overflow: visible;
     align-items: stretch;
   }
-
   .uf-page { padding: 20px 20px 48px; max-width: 100%; }
   .uf-heading-text h1 { font-size: 18px; }
 }

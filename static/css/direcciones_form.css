@@ -7,7 +7,7 @@
 .df-page {
   padding: 28px 36px 64px;
   width: 100%;
-  max-width: 860px;
+  /* Sin max-width fijo: se adapta al espacio disponible */
   box-sizing: border-box;
   font-family: var(--font-sans);
 }
@@ -42,7 +42,7 @@
 }
 
 .df-heading-text h1 {
-  font-size: 24px;
+  font-size: clamp(20px, 2vw, 28px);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -.3px;
@@ -72,7 +72,7 @@
   margin-top: 4px;
 }
 
-/* ── Breadcrumb-style nav ─────────────────────────────────── */
+/* ── Breadcrumb nav ───────────────────────────────────────── */
 .df-nav {
   display: flex;
   align-items: center;
@@ -227,7 +227,6 @@
 }
 .df-input.mono { font-family: var(--font-mono); letter-spacing: .5px; font-size: 14px; }
 
-/* Readonly badge wrapper */
 .df-input-wrap { position: relative; }
 .df-readonly-badge {
   position: absolute;
@@ -388,7 +387,42 @@
   letter-spacing: 1px;
 }
 
-/* ── Responsive ───────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════
+   PANTALLAS GRANDES (≥ 1440 px)
+   ══════════════════════════════════════════════════════════ */
+@media (min-width: 1440px) {
+  .df-page { padding: 36px 56px 80px; }
+  .df-heading { margin-bottom: 36px; }
+  .df-heading-icon { width: 56px; height: 56px; }
+  .df-section-header { padding: 15px 22px; }
+  .df-section-title  { font-size: 14px; }
+  .df-section-body   { padding: 24px 22px; gap: 20px; }
+  .df-grid { gap: 20px; }
+  .df-input { padding: 10px 14px; font-size: 14px; }
+  .df-label { font-size: 13px; }
+  .df-hint  { font-size: 12px; }
+  .df-footer { padding: 22px 24px; }
+  .df-form   { gap: 20px; }
+}
+
+@media (min-width: 1920px) {
+  .df-page { padding: 48px 80px 96px; }
+  .df-heading-icon { width: 64px; height: 64px; }
+  .df-section-header { padding: 18px 26px; }
+  .df-section-title  { font-size: 15px; }
+  .df-section-subtitle { font-size: 13px; }
+  .df-section-body   { padding: 28px 26px; gap: 24px; }
+  .df-grid { gap: 24px; }
+  .df-input { padding: 12px 16px; font-size: 15px; }
+  .df-label { font-size: 14px; }
+  .df-hint  { font-size: 13px; }
+  .df-footer { padding: 26px 28px; }
+  .df-form   { gap: 24px; }
+  .df-btn-submit,
+  .df-btn-cancel { padding: 11px 26px; font-size: 15px; }
+}
+
+/* ── Responsive pequeño ───────────────────────────────────── */
 @media (max-width: 1100px) {
   .df-page { padding: 24px 28px 56px; }
 }
