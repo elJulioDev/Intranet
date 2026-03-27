@@ -78,7 +78,6 @@ foreach ($rows as $r) {
       gap: 16px;
       margin-bottom: 24px;
       flex-wrap: wrap;
-      max-width: 960px;
     }
     .ls-heading-left { display: flex; align-items: center; gap: 14px; }
     .ls-heading-icon {
@@ -98,7 +97,6 @@ foreach ($rows as $r) {
     /* Stats strip */
     .ls-stats {
       display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
-      max-width: 960px;
     }
     .ls-stat {
       display: inline-flex; align-items: center; gap: 7px;
@@ -115,7 +113,6 @@ foreach ($rows as $r) {
     .ls-filter {
       background: var(--surface-1); border: 1px solid var(--border-1);
       border-radius: var(--r-lg); overflow: hidden; margin-bottom: 16px;
-      max-width: 960px;
     }
     .ls-filter-header {
       display: flex; align-items: center; gap: 10px;
@@ -148,7 +145,6 @@ foreach ($rows as $r) {
     .ls-table-card {
       background: var(--surface-1); border: 1px solid var(--border-1);
       border-radius: var(--r-lg); overflow-x: auto;
-      max-width: 960px;
     }
     .ls-table {
       width: 100%; border-collapse: collapse;
@@ -221,15 +217,11 @@ foreach ($rows as $r) {
     /* ── Responsive ─────────────────────────────────────── */
     @media (min-width: 1440px) {
       .ls-page { padding: 36px 56px 80px; }
-      .ls-heading { margin-bottom: 32px; max-width: 1060px; }
       .ls-heading-icon { width: 56px; height: 56px; }
-      .ls-table-card, .ls-filter, .ls-stats { max-width: 1060px; }
     }
     @media (min-width: 1920px) {
       .ls-page { padding: 48px 80px 96px; }
       .ls-heading-icon { width: 64px; height: 64px; }
-      .ls-heading { max-width: 1160px; }
-      .ls-table-card, .ls-filter, .ls-stats { max-width: 1160px; }
     }
     @media (max-width: 1100px) {
       .ls-page { padding: 24px 28px 56px; }
