@@ -1,8 +1,12 @@
 <?php
 // intranet/inc/auth.php (PHP 5.6)
+// Guard: evita re-declarar funciones si se incluye más de una vez
+if (defined('_AUTH_LOADED')) return;
+define('_AUTH_LOADED', true);
+
 if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
-require __DIR__ . '/db.php';
+require_once __DIR__ . '/db.php';
 
 function norm_rut($rut) {
   $rut = strtoupper(trim((string)$rut));
