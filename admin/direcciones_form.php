@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="../static/css/theme.css">
   <link rel="stylesheet" href="../static/css/sidebar.css">
-  <link rel="stylesheet" href="../static/css/users_form.css">
+  <link rel="stylesheet" href="../static/css/form.css">
   <link rel="icon" type="image/x-icon" href="../static/img/logo.png">
 </head>
 <body>
