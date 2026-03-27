@@ -52,7 +52,7 @@ Sigue estos pasos para desplegar el proyecto en un entorno local (como XAMPP, WA
 1. **Clonar el repositorio:**
 
    ```bash
-   git clone [https://github.com/elJulioDev/intranet.git](https://github.com/elJulioDev/intranet.git)
+   git clone https://github.com/elJulioDev/Intranet.git
    cd intranet
    ```
    
