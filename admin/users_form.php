@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Admin | Crear Usuario</title>
+  <title>Admin · Crear Usuario</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="../static/css/theme.css">
   <link rel="stylesheet" href="../static/css/form.css">

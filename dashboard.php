@@ -62,7 +62,7 @@ $cntCurso = max(0, $cntTotal - $cntComp - $cntPend);
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Intranet | Dashboard</title>
+  <title>Intranet · Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="static/css/theme.css">
   <link rel="stylesheet" href="static/css/sidebar.css">
