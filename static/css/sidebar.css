@@ -474,8 +474,33 @@ body {
 
   .sidebar-scroll { overflow-y: auto; }
 
-  .sidebar-overlay           { display: block; }
+  .sidebar-overlay {
+    z-index: 250; 
+  }
   .sidebar-overlay.is-hidden { display: none; }
+
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+  }
+
+  .body-layout {
+    display: block;
+    overflow: visible;
+    position: relative;
+    padding-top: 52px;
+  }
+
+  .topbar-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 5px;
+  }
 
   .sidebar-close-btn { display: flex; }
   .profile-row { padding-right: 42px; }
