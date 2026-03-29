@@ -230,14 +230,14 @@ function tipoIconSvg($t) {
       background: var(--surface-1); border: 1px solid var(--border-1);
       border-radius: 0 0 var(--r-lg) var(--r-lg); overflow-x: auto;
     }
-    .pm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .pm-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed;}
     .pm-table thead th {
       padding: 9px 10px; text-align: center;
       font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px;
       color: var(--text-subtle); background: var(--surface-2);
       border-bottom: 1px solid var(--border-1); white-space: nowrap;
     }
-    .pm-table thead th.th-recurso { text-align: left; padding-left: 16px; min-width: 200px; }
+    .pm-table thead th.th-recurso { text-align: left; padding-left: 16px; width: 35%; min-width: 200px; }
     .pm-table thead th.th-accion  { min-width: 64px; }
     /* Fila select-all por columna */
     .tr-selectall td { padding: 7px 10px; background: var(--surface-2); border-bottom: 2px solid var(--border-1); text-align: center; }
@@ -309,6 +309,104 @@ function tipoIconSvg($t) {
     .ls-empty svg { margin: 0 auto 12px; opacity: .2; display: block; }
     .ls-empty p   { font-size: 13px; color: var(--text-muted); margin: 0; }
 
+    /* ══ Sticky floating thead ═════════════════════════════════ */
+    .rp-sticky-bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity .18s ease, transform .18s ease;
+      margin: 0 -36px -54px -36px; 
+      padding: 0 36px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border-1);
+      box-shadow: 0 4px 16px rgba(0,0,0,.18);
+    }
+    .rp-sticky-bar.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    /* Inner: alinea badge + tabla en una sola fila compacta */
+    .rp-sb-inner {
+      display: relative;
+      display: block;
+      align-items: stretch;
+      gap: 0;
+      width: 100%;
+    }
+
+    /* Badge lateral izquierdo — indica la sección activa */
+    .rp-sb-badge {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 90px;
+      gap: 3px;
+      padding: 8px 14px;
+      border-right: 1px solid var(--border-1);
+      min-width: 80px;
+      flex-shrink: 0;
+      transition: background .25s, color .25s;
+      z-index: 10;
+    }
+    .rp-sb-badge-icon { display: flex; align-items: center; justify-content: center; }
+    .rp-sb-badge-name { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; white-space: nowrap; }
+
+    /* Colores del badge según sección activa */
+    .rp-sb-badge.is-modulo  { background: rgba(56,139,253,.08);  color: var(--blue);   }
+    .rp-sb-badge.is-pagina  { background: rgba(163,113,247,.08); color: var(--purple); }
+    .rp-sb-badge.is-admin   { background: rgba(248,81,73,.08);   color: #f85149;       }
+    .rp-sb-badge.is-reporte { background: rgba(210,153,34,.08);  color: var(--amber);  }
+    .rp-sb-badge.is-api     { background: rgba(63,185,80,.08);   color: var(--green);  }
+    .rp-sb-badge.is-otro    { background: var(--surface-2);      color: var(--text-muted); }
+
+    /* Tabla interna del sticky — replica visualmente el thead real */
+    .rp-sb-table-wrap { width: 100%; overflow-x: auto; }
+    .rp-sb-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    /* Fila de nombres de columna */
+    .rp-sb-table .rp-row-names th {
+      padding: 6px 10px;
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px;
+      color: var(--text-subtle); background: var(--surface-2);
+      border-bottom: 1px solid var(--border-2);
+      text-align: center; white-space: nowrap;
+    }
+    .rp-sb-table .rp-row-names th.rp-th-re { 
+      text-align: left; 
+      padding-left: 106px !important; 
+      width: 35%;          /* <--- Mismo ancho que pm-table */
+      min-width: 200px; 
+    }
+    .rp-sb-table .rp-row-names th.rp-th-ac { 
+      min-width: 64px;
+    }
+
+    /* Fila de checkboxes select-all */
+    .rp-sb-table .rp-row-sel td {
+      padding: 6px 10px;
+      background: var(--surface-2);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .rp-sb-table .rp-row-sel .rp-td-sellabel {
+      text-align: left; 
+      padding-left: 106px !important; /* <--- Mismo padding para esquivar el badge */
+      font-size: 9px; font-weight: 600; color: var(--text-subtle);
+      text-transform: uppercase; letter-spacing: .5px;
+    }
+    /* Checkbox proxy del sticky */
+    .rp-col-proxy { width: 15px; height: 15px; cursor: pointer; accent-color: var(--green); vertical-align: middle; }
+
     /* ══ Responsive ════════════════════════════════════════════ */
     @media (min-width:1440px) { .ls-page { padding: 36px 56px 96px; } .ls-heading-icon { width: 56px; height: 56px; } }
     @media (min-width:1920px) { .ls-page { padding: 48px 80px 112px; } }
@@ -328,6 +426,8 @@ function tipoIconSvg($t) {
       /* Tabla oculta, cards visibles */
       .pm-table-wrap      { display: none; }
       .pm-cards           { display: block; }
+      /* El sticky thead no aplica en móvil (se usa cards) */
+      .rp-sticky-bar      { display: none !important; }
       /* Save bar */
       .pm-save-bar        { flex-direction: column; align-items: stretch; bottom: 8px; padding: 12px 14px; gap: 10px; z-index: 100; }
       .pm-save-info       { text-align: center; }
@@ -459,6 +559,53 @@ function tipoIconSvg($t) {
       <form method="post" id="perm-form">
         <input type="hidden" name="csrf" value="<?php echo _sb_h(csrf_token()); ?>">
         <input type="hidden" name="rid"  value="<?php echo (int)$rid; ?>">
+
+        <!-- ════ Sticky floating thead ══════════════════════════
+             Visible sólo en desktop (≥800px) cuando el thead real
+             se desplaza fuera de la vista. Los checkboxes son proxies:
+             no tienen name → no se envían al servidor.
+             JS los sincroniza con los col-cb reales del grupo activo.
+        ════════════════════════════════════════════════════════ -->
+        <div id="rp-sticky-bar" class="rp-sticky-bar" aria-hidden="true">
+          <div class="rp-sb-inner">
+
+            <!-- Badge de sección activa -->
+            <div class="rp-sb-badge is-otro" id="rp-sb-badge">
+              <span class="rp-sb-badge-icon" id="rp-sb-icon">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+              </span>
+              <span class="rp-sb-badge-name" id="rp-sb-label">—</span>
+            </div>
+
+            <!-- Tabla con cabeceras + fila de select-all -->
+            <div class="rp-sb-table-wrap">
+              <table class="rp-sb-table">
+                <thead>
+                  <tr class="rp-row-names">
+                    <th class="rp-th-re">Recurso</th>
+                    <?php foreach ($acciones as $a): ?>
+                      <th class="rp-th-ac" title="<?php echo _sb_h($a['nombre']); ?>">
+                        <?php echo _sb_h($a['codigo']); ?>
+                      </th>
+                    <?php endforeach; ?>
+                  </tr>
+                  <tr class="rp-row-sel">
+                    <td class="rp-td-sellabel">Seleccionar columna completa</td>
+                    <?php foreach ($acciones as $a): ?>
+                      <td>
+                        <input type="checkbox"
+                               class="rp-col-proxy"
+                               data-proxy-ac="<?php echo (int)$a['id']; ?>"
+                               title="<?php echo _sb_h($a['nombre']); ?>">
+                      </td>
+                    <?php endforeach; ?>
+                  </tr>
+                </thead>
+              </table>
+            </div><!-- /.rp-sb-table-wrap -->
+
+          </div><!-- /.rp-sb-inner -->
+        </div><!-- /#rp-sticky-bar -->
 
         <?php foreach ($recursosPorTipo as $tipo => $recsDelTipo):
           $tipoSlug  = strtolower($tipo);
@@ -819,6 +966,159 @@ function rpToggleCard(reId) {
   var card = document.getElementById('mcard-' + reId);
   if (card) card.classList.toggle('is-open');
 }
+
+/* ════════════════════════════════════════════════════════════
+   STICKY THEAD — detecta sección activa y muestra/oculta el bar
+   ════════════════════════════════════════════════════════════ */
+(function() {
+  var stickyBar   = document.getElementById('rp-sticky-bar');
+  var sbBadge     = document.getElementById('rp-sb-badge');
+  var sbIcon      = document.getElementById('rp-sb-icon');
+  var sbLabel     = document.getElementById('rp-sb-label');
+  var proxyCbs    = document.querySelectorAll('.rp-col-proxy');
+  var mainContent = document.querySelector('.main-content') || window;
+
+  if (!stickyBar) return;
+
+  /* SVG icons por tipo — mismos que tipoIconSvg() en PHP */
+  var ICONS = {
+    modulo:  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+    pagina:  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    admin:   '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    reporte: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    api:     '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+    otro:    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+  };
+
+  /* Recopila las secciones y sus tablas al cargar */
+  var sections = [];
+  document.querySelectorAll('.tipo-section[id]').forEach(function(sec) {
+    var tableWrap = sec.querySelector('.pm-table-wrap');
+    var thead     = tableWrap ? tableWrap.querySelector('thead') : null;
+    if (!tableWrap || !thead) return;
+    /* Extrae el slug del tipo del id (ej. "group-modulo" → "modulo") */
+    var slug = sec.id.replace('group-', '');
+    /* Etiqueta: primera letra mayúscula */
+    var label = slug.charAt(0).toUpperCase() + slug.slice(1);
+    sections.push({ el: sec, tableWrap: tableWrap, thead: thead, slug: slug, label: label, groupId: sec.id });
+  });
+
+  if (!sections.length) return;
+
+  var activeSlug = null; /* slug de la sección actualmente activa en el sticky */
+
+  /* Sincroniza los checkboxes proxy con los col-cb reales del grupo */
+  function syncProxies(groupId) {
+    proxyCbs.forEach(function(proxy) {
+      var acId   = proxy.getAttribute('data-proxy-ac');
+      var realCb = document.querySelector('.col-cb[data-accion="' + acId + '"][data-group="' + groupId + '"]');
+      proxy.checked = realCb ? realCb.checked : false;
+    });
+  }
+
+  /* Actualiza el badge de sección */
+  function updateBadge(slug, label) {
+    /* Quita clase anterior */
+    sbBadge.className = 'rp-sb-badge is-' + slug;
+    sbIcon.innerHTML  = ICONS[slug] || ICONS['otro'];
+    sbLabel.textContent = label;
+  }
+
+  /* Calcula qué sección está activa basándose en la posición del scroll */
+  function getActiveSection() {
+    /* El sticky bar tiene altura fija; usamos su bottom como referencia */
+    var stickyBottom = stickyBar.getBoundingClientRect().bottom;
+    var active = null;
+
+    sections.forEach(function(sec) {
+      var rect = sec.el.getBoundingClientRect();
+      /* La sección está "activa" si su top ya pasó hacia arriba del sticky
+         pero su bottom todavía no ha salido por arriba */
+      if (rect.top <= stickyBottom && rect.bottom > stickyBottom) {
+        active = sec;
+      }
+    });
+
+    /* Fallback: si ninguna coincide exactamente (entre secciones),
+       tomamos la última cuyo top ya quedó arriba del sticky */
+    if (!active) {
+      sections.forEach(function(sec) {
+        if (sec.el.getBoundingClientRect().top <= stickyBottom) {
+          active = sec;
+        }
+      });
+    }
+
+    return active;
+  }
+
+  /* Determina si debemos mostrar el sticky bar.
+     Lo mostramos cuando el thead de la primera sección sale de la vista. */
+  function shouldShow() {
+    var firstThead = sections[0].thead;
+    var rect = firstThead.getBoundingClientRect();
+    /* El sticky ocupa ~56px aprox; mostramos cuando el thead sale por esa altura */
+    return rect.bottom <= stickyBar.getBoundingClientRect().height + 2;
+  }
+
+  /* Lógica principal del scroll */
+  function onScroll() {
+    var show = shouldShow();
+
+    if (show) {
+      stickyBar.classList.add('is-visible');
+      stickyBar.setAttribute('aria-hidden', 'false');
+
+      var sec = getActiveSection();
+      if (sec && sec.slug !== activeSlug) {
+        activeSlug = sec.slug;
+        updateBadge(sec.slug, sec.label);
+        syncProxies(sec.groupId);
+      }
+    } else {
+      stickyBar.classList.remove('is-visible');
+      stickyBar.setAttribute('aria-hidden', 'true');
+      activeSlug = null;
+    }
+  }
+
+  /* Escucha scroll en main-content (overflow-y: auto) */
+  mainContent.addEventListener('scroll', onScroll, { passive: true });
+  /* También en window por si hay casos edge */
+  window.addEventListener('scroll', onScroll, { passive: true });
+  /* Comprobación inicial */
+  onScroll();
+
+  /* Evento de los checkboxes proxy — dispara la lógica del col-cb real */
+  proxyCbs.forEach(function(proxy) {
+    proxy.addEventListener('change', function() {
+      if (!activeSlug) return;
+      var acId    = this.getAttribute('data-proxy-ac');
+      var groupId = 'group-' + activeSlug;
+      /* Dispara el col-cb real para que toda la lógica de sincronización funcione */
+      var realCb = document.querySelector('.col-cb[data-accion="' + acId + '"][data-group="' + groupId + '"]');
+      if (realCb) {
+        realCb.checked = this.checked;
+        /* Dispara el evento change para que el listener existente haga su trabajo */
+        var evt = document.createEvent('Event');
+        evt.initEvent('change', true, true);
+        realCb.dispatchEvent(evt);
+      }
+    });
+  });
+
+  /* Cuando cambia un col-cb real, actualiza también el proxy correspondiente */
+  document.querySelectorAll('.col-cb').forEach(function(realCb) {
+    realCb.addEventListener('change', function() {
+      var acId    = this.getAttribute('data-accion');
+      var groupId = this.getAttribute('data-group');
+      if (groupId !== 'group-' + activeSlug) return;
+      var proxy = document.querySelector('.rp-col-proxy[data-proxy-ac="' + acId + '"]');
+      if (proxy) proxy.checked = this.checked;
+    });
+  });
+
+})(); /* fin IIFE sticky */
 </script>
 </body>
 </html>
