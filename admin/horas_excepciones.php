@@ -41,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
           }
 
           $pdo->beginTransaction();
-
           $st = $pdo->prepare("
             INSERT INTO availability_exceptions(service_id,date_day,is_closed,capacity_override,note)
             VALUES(?,?,?,?,?)
@@ -52,25 +51,19 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
           ");
           $st->execute(array($serviceIdPost,$date,$isClosed,$cap,($note===''?null:$note)));
 
-          // Cierre/apertura inmediata de slots ya generados
           if ($isClosed===1) {
             $pdo->prepare("UPDATE slots SET status='closed' WHERE service_id=? AND date_day=?")
                 ->execute(array($serviceIdPost,$date));
           } else {
-            // Reabre slots solo si tienen cupo y no están manualmente cerrados por capacidad 0
-            $pdo->prepare("UPDATE slots
-                           SET status='open'
-                           WHERE service_id=? AND date_day=? AND (capacity_total - capacity_used) > 0")
+            $pdo->prepare("UPDATE slots SET status='open' WHERE service_id=? AND date_day=? AND (capacity_total - capacity_used) > 0")
                 ->execute(array($serviceIdPost,$date));
           }
-
           $pdo->commit();
           $msg='Excepción guardada.';
         }
 
         if ($action==='delete') {
           $id = (int)(isset($_POST['id']) ? $_POST['id'] : 0);
-          // Para borrar, obtenemos la fecha y luego reabrimos slots (si corresponde)
           $q = $pdo->prepare("SELECT date_day,is_closed FROM availability_exceptions WHERE id=? AND service_id=? LIMIT 1");
           $q->execute(array($id,$serviceIdPost));
           $ex = $q->fetch(PDO::FETCH_ASSOC);
@@ -79,12 +72,9 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
           $pdo->prepare("DELETE FROM availability_exceptions WHERE id=? AND service_id=?")->execute(array($id,$serviceIdPost));
 
           if ($ex && (int)$ex['is_closed']===1) {
-            $pdo->prepare("UPDATE slots
-                           SET status='open'
-                           WHERE service_id=? AND date_day=? AND (capacity_total - capacity_used) > 0")
+            $pdo->prepare("UPDATE slots SET status='open' WHERE service_id=? AND date_day=? AND (capacity_total - capacity_used) > 0")
                 ->execute(array($serviceIdPost,$ex['date_day']));
           }
-
           $pdo->commit();
           $msg='Excepción eliminada.';
         }
@@ -104,133 +94,155 @@ if ($serviceId>0){
   $st->execute(array($serviceId));
   $rows=$st->fetchAll(PDO::FETCH_ASSOC);
 }
+
+$navActive = 'excepciones';
+$navTitle  = 'Excepciones';
+require __DIR__ . '/../inc/horas_nav.php';
 ?>
-<!doctype html>
-<html lang="es"><head>
-<meta charset="utf-8">
-<title>Horas | Excepciones</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<style>
-  body{font-family:Arial,sans-serif;margin:18px;color:#111;background:#fafafa;}
-  .card{border:1px solid #ddd;border-radius:10px;padding:14px;background:#fff;}
-  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;}
-  .muted{color:#666;}
-  a.btn, button.btn{display:inline-block;padding:10px 12px;border:1px solid #111;border-radius:8px;text-decoration:none;background:#fff;cursor:pointer;}
-  a.btn:hover, button.btn:hover{background:#111;color:#fff;}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;}
-  .grid{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:10px;margin-top:10px;}
-  .grid .full{grid-column:1/-1;}
-  label{font-size:12px;color:#333;}
-  input, select{width:100%;padding:9px;border:1px solid #ddd;border-radius:8px;}
-  table{width:100%;border-collapse:collapse;margin-top:12px;}
-  th,td{border:1px solid #ddd;padding:8px;vertical-align:top;text-align:left;}
-  th{background:#f6f6f6;}
-  .ok{color:#0a7a2f;}
-  .bad{color:#b00020;}
-  .hint{font-size:12px;color:#666;margin-top:6px;}
-</style>
-</head><body>
 
-<div class="row">
-  <div class="card" style="min-width:320px;flex:1;">
-    <h2 style="margin:0 0 6px 0;">Excepciones por fecha</h2>
-    <div class="muted">Cierra días completos o define cupos especiales por fecha.</div>
-
-    <div class="toolbar">
-      <a class="btn" href="horas_dashboard.php">← Volver</a>
-    </div>
-
-    <?php if($msg): ?><p class="ok"><b><?php echo horas_h($msg); ?></b></p><?php endif; ?>
-    <?php if($err): ?><p class="bad"><b><?php echo horas_h($err); ?></b></p><?php endif; ?>
-
-    <form method="get" class="toolbar">
-      <label style="min-width:80px;">Servicio</label>
-      <select name="service_id" onchange="this.form.submit()">
-        <?php foreach($services as $s): ?>
-          <option value="<?php echo (int)$s['id']; ?>" <?php echo ((int)$s['id']===$serviceId?'selected':''); ?>>
-            <?php echo horas_h($s['name']); ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
+<div class="ph">
+  <div class="ph-left">
+    <h1>Excepciones por fecha</h1>
+    <p>Cierra días completos o define cupos especiales para fechas específicas</p>
+  </div>
+  <?php if(count($services) > 1): ?>
+  <div class="ph-actions">
+    <form method="get">
+      <div class="field" style="margin:0;min-width:220px;">
+        <select name="service_id" onchange="this.form.submit()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:14px;">
+          <?php foreach($services as $s): ?>
+            <option value="<?php echo (int)$s['id']; ?>" <?php echo ((int)$s['id']===$serviceId?'selected':''); ?>>
+              <?php echo horas_h($s['name']); ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
     </form>
+  </div>
+  <?php endif; ?>
+</div>
 
-    <?php if($serviceId<=0): ?>
-      <p class="muted" style="margin-top:12px;">No tienes servicios asignados.</p>
-    <?php else: ?>
+<?php if($msg): ?>
+<div class="alert alert-ok">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+  <?php echo horas_h($msg); ?>
+</div>
+<?php endif; ?>
+<?php if($err): ?>
+<div class="alert alert-err">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+  <?php echo horas_h($err); ?>
+</div>
+<?php endif; ?>
 
-      <h3 style="margin:14px 0 6px 0;">Nueva excepción / actualizar</h3>
+<?php if($serviceId <= 0): ?>
+<div class="card"><div class="card-body">
+  <div class="empty"><p>No tienes servicios asignados.</p></div>
+</div></div>
+<?php else: ?>
 
+<div style="display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start;">
+
+  <div class="card">
+    <div class="card-header">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px;vertical-align:middle;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nueva excepción
+      </h2>
+    </div>
+    <div class="card-body">
       <form method="post">
         <input type="hidden" name="horas_csrf" value="<?php echo horas_h(horas_csrf_token()); ?>">
         <input type="hidden" name="action" value="upsert">
         <input type="hidden" name="service_id" value="<?php echo (int)$serviceId; ?>">
 
-        <div class="grid">
-          <div>
+        <div class="form-grid form-grid-2">
+          <div class="field full">
             <label>Fecha</label>
             <input type="date" name="date_day" required>
           </div>
-
-          <div>
+          <div class="field">
             <label>Cerrar día</label>
             <select name="is_closed">
               <option value="0">No</option>
-              <option value="1">Sí</option>
+              <option value="1">Sí — cerrar</option>
             </select>
-            <div class="hint">Si “Sí”, se cierran slots existentes.</div>
+            <span class="hint">Cierra slots existentes</span>
           </div>
-
-          <div>
+          <div class="field">
             <label>Cupos override</label>
-            <input name="capacity_override" type="number" min="0" max="50" placeholder="vacío = no cambia">
-            <div class="hint">Si pones número, se usa al generar.</div>
+            <input name="capacity_override" type="number" min="0" max="50" placeholder="Vacío = sin cambio">
           </div>
-
-          <div class="full">
+          <div class="field full">
             <label>Nota (opcional)</label>
-            <input name="note" maxlength="255" placeholder="Ej: feriado / jornada especial">
+            <input name="note" maxlength="255" placeholder="Ej: Feriado, jornada especial…">
           </div>
-
           <div class="full">
-            <button class="btn" type="submit">Guardar excepción</button>
+            <button class="btn btn-primary" type="submit">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+              Guardar excepción
+            </button>
           </div>
         </div>
       </form>
+    </div>
+  </div>
 
-      <h3 style="margin:16px 0 6px 0;">Excepciones existentes</h3>
-
+  <div class="card">
+    <div class="card-header">
+      <h2>Excepciones registradas
+        <span style="font-size:12px;font-weight:400;color:var(--muted);margin-left:8px;"><?php echo count($rows); ?> registro<?php echo count($rows)!==1?'s':''; ?></span>
+      </h2>
+    </div>
+    <div class="table-wrap">
       <table>
-        <tr>
-          <th style="width:140px;">Fecha</th>
-          <th style="width:90px;">Cerrado</th>
-          <th style="width:140px;">Override</th>
-          <th>Nota</th>
-          <th style="width:120px;">Acción</th>
-        </tr>
-        <?php foreach($rows as $r): ?>
+        <thead>
           <tr>
-            <td><?php echo horas_h($r['date_day']); ?></td>
-            <td><?php echo ((int)$r['is_closed']===1?'Sí':'No'); ?></td>
-            <td><?php echo ($r['capacity_override']===null?'-':(int)$r['capacity_override']); ?></td>
-            <td><?php echo horas_h($r['note']); ?></td>
+            <th>Fecha</th>
+            <th>Cerrado</th>
+            <th>Override</th>
+            <th>Nota</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach($rows as $r): ?>
+          <tr>
+            <td><b><?php echo horas_h($r['date_day']); ?></b></td>
             <td>
-              <form method="post" onsubmit="return confirm('¿Eliminar excepción?');">
+              <?php if((int)$r['is_closed']===1): ?>
+                <span class="pill pill-yes">Cerrado</span>
+              <?php else: ?>
+                <span class="pill pill-no">Abierto</span>
+              <?php endif; ?>
+            </td>
+            <td><?php echo ($r['capacity_override']===null ? '<span style="color:var(--muted)">–</span>' : (int)$r['capacity_override']); ?></td>
+            <td style="color:var(--muted)"><?php echo horas_h($r['note'] ?: ''); ?></td>
+            <td>
+              <form method="post" onsubmit="return confirm('¿Eliminar esta excepción?');">
                 <input type="hidden" name="horas_csrf" value="<?php echo horas_h(horas_csrf_token()); ?>">
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="service_id" value="<?php echo (int)$serviceId; ?>">
                 <input type="hidden" name="id" value="<?php echo (int)$r['id']; ?>">
-                <button class="btn" type="submit">Eliminar</button>
+                <button class="btn btn-danger btn-sm" type="submit">Eliminar</button>
               </form>
             </td>
           </tr>
-        <?php endforeach; ?>
-        <?php if(empty($rows)): ?>
-          <tr><td colspan="5" class="muted">Aún no hay excepciones.</td></tr>
-        <?php endif; ?>
+          <?php endforeach; ?>
+          <?php if(empty($rows)): ?>
+          <tr><td colspan="5">
+            <div class="empty"><p>Aún no hay excepciones para este servicio.</p></div>
+          </td></tr>
+          <?php endif; ?>
+        </tbody>
       </table>
-
-    <?php endif; ?>
+    </div>
   </div>
+
 </div>
 
-</body></html>
+<?php endif; ?>
+
+</div><!-- hn-main -->
+</body>
+</html>
